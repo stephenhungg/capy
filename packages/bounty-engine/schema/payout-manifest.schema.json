@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:capy:schema:solana-payout-manifest:0.1",
+  "title": "capy solana payout manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "manifestId",
+    "bountyId",
+    "capabilityReceiptId",
+    "asset",
+    "sourceTokenAccount",
+    "calculation",
+    "transfers",
+    "withheld",
+    "attestations",
+    "execution",
+    "canonicalJson"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "capy.solana-payout-manifest/0.1" },
+    "manifestId": { "type": "string", "pattern": "^manifest_[a-f0-9]{32}$" },
+    "bountyId": { "type": "string", "minLength": 1 },
+    "capabilityReceiptId": { "type": "string", "minLength": 1 },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["standard", "network", "tokenProgram", "mint", "decimals"],
+      "properties": {
+        "standard": { "const": "spl-token" },
+        "network": { "enum": ["mainnet-beta", "devnet", "testnet", "localnet"] },
+        "tokenProgram": { "$ref": "#/$defs/solanaAddress" },
+        "mint": { "$ref": "#/$defs/solanaAddress" },
+        "decimals": { "type": "integer", "minimum": 0, "maximum": 18 }
+      }
+    },
+    "sourceTokenAccount": { "$ref": "#/$defs/solanaAddress" },
+    "calculation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalAtomic",
+        "poolAtomic",
+        "aggregateLowerBoundLiftBps",
+        "earnedPerformanceAtomic",
+        "cohortLowerBoundLiftBps",
+        "paidAtomic",
+        "withheldAtomic"
+      ],
+      "properties": {
+        "totalAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "poolAtomic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["acceptance", "performance", "reuse", "disputeReserve"],
+          "properties": {
+            "acceptance": { "$ref": "#/$defs/atomicAmount" },
+            "performance": { "$ref": "#/$defs/atomicAmount" },
+            "reuse": { "$ref": "#/$defs/atomicAmount" },
+            "disputeReserve": { "$ref": "#/$defs/atomicAmount" }
+          }
+        },
+        "aggregateLowerBoundLiftBps": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "earnedPerformanceAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "cohortLowerBoundLiftBps": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 10000 }
+        },
+        "paidAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "withheldAtomic": { "$ref": "#/$defs/atomicAmount" }
+      }
+    },
+    "transfers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "transferId",
+          "recipientOwner",
+          "recipientTokenAccount",
+          "amountAtomic",
+          "contributorIds",
+          "lineItems"
+        ],
+        "properties": {
+          "transferId": { "type": "string", "pattern": "^transfer_[a-f0-9]{32}$" },
+          "recipientOwner": { "$ref": "#/$defs/solanaAddress" },
+          "recipientTokenAccount": {
+            "oneOf": [{ "$ref": "#/$defs/solanaAddress" }, { "type": "null" }]
+          },
+          "amountAtomic": { "$ref": "#/$defs/positiveAtomicAmount" },
+          "contributorIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "lineItems": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["contributionId", "pool", "amountAtomic"],
+              "properties": {
+                "contributionId": { "type": "string", "minLength": 1 },
+                "pool": { "enum": ["acceptance", "performance", "reuse"] },
+                "amountAtomic": { "$ref": "#/$defs/positiveAtomicAmount" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "withheld": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amountAtomic",
+        "includesDisputeReserveAtomic",
+        "includesUnearnedPerformanceAtomic",
+        "includesUnallocatedAcceptanceAtomic",
+        "includesUnallocatedPerformanceAtomic",
+        "includesUnallocatedReuseAtomic",
+        "disposition"
+      ],
+      "properties": {
+        "amountAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "includesDisputeReserveAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "includesUnearnedPerformanceAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "includesUnallocatedAcceptanceAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "includesUnallocatedPerformanceAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "includesUnallocatedReuseAtomic": { "$ref": "#/$defs/atomicAmount" },
+        "disposition": { "type": "string", "minLength": 1 }
+      }
+    },
+    "attestations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocolHash", "holdoutCommitmentHash", "evaluatorCommitmentHash", "inputHash"],
+      "properties": {
+        "protocolHash": { "type": "string", "minLength": 1 },
+        "holdoutCommitmentHash": { "type": "string", "minLength": 1 },
+        "evaluatorCommitmentHash": { "type": "string", "minLength": 1 },
+        "inputHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instruction", "recipientAccountPolicy", "status"],
+      "properties": {
+        "instruction": { "const": "transferChecked" },
+        "recipientAccountPolicy": {
+          "const": "derive_associated_token_account_and_create_idempotently_if_missing"
+        },
+        "status": { "const": "unsigned" }
+      }
+    },
+    "canonicalJson": { "type": "string", "minLength": 2 }
+  },
+  "$defs": {
+    "solanaAddress": {
+      "type": "string",
+      "pattern": "^[1-9A-HJ-NP-Za-km-z]{32,44}$"
+    },
+    "atomicAmount": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$"
+    },
+    "positiveAtomicAmount": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    }
+  }
+}
