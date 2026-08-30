@@ -1,0 +1,405 @@
+{
+  "$schema": "https://capy.network/schemas/v1/capability-manifest.schema.json",
+  "protocol_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "object_type": "capability_manifest",
+  "object_id": "urn:uuid:11111111-1111-4111-8111-111111111111",
+  "issued_at": "2026-08-30T18:00:00Z",
+  "payload": {
+    "title": "camera-free guarded-button press on an I2RT YAM right arm",
+    "summary": "learn contact-robust button pressing from proprioception, a supplied target pose, and a fixture switch; cameras, audio, and biometric capture are prohibited.",
+    "requester": {
+      "actor_id": "urn:capy:actor:requester-lab",
+      "role": "capability_requester",
+      "key_id": "urn:capy:key:requester-lab-2026-01"
+    },
+    "embodiment": {
+      "manufacturer": "I2RT Robotics",
+      "model": "YAM",
+      "configuration_id": "yam-right-linear-4310-v1",
+      "description_artifacts": [
+        {
+          "uri": "https://artifacts.example.capy.network/yam/yam-right.urdf",
+          "media_type": "application/xml",
+          "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "size_bytes": "48132"
+        },
+        {
+          "uri": "https://artifacts.example.capy.network/yam/yam-right.xml",
+          "media_type": "application/xml",
+          "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "size_bytes": "52709"
+        }
+      ],
+      "controlled_joints": [
+        "joint_0",
+        "joint_1",
+        "joint_2",
+        "joint_3",
+        "joint_4",
+        "joint_5",
+        "gripper"
+      ],
+      "base_frame": "yam_base",
+      "tool_frame": "yam_gripper_tip"
+    },
+    "task": {
+      "instruction": "from the randomized safe start pose, move the gripper tip to the supplied fixture target pose, depress the guarded button until the dry-contact switch remains true for 200 ms, then retreat 50 mm along the tool z axis.",
+      "workspace": {
+        "uri": "https://artifacts.example.capy.network/tasks/guarded-button/workspace-v1.json",
+        "media_type": "application/json",
+        "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "size_bytes": "8441"
+      },
+      "initial_conditions": [
+        "the fixture is attached to one of four indexed mounting points inside the declared workspace",
+        "the target pose is published before motion and remains constant for the episode",
+        "the robot starts inside the safe joint-state envelope with the gripper open"
+      ],
+      "success_conditions": [
+        {
+          "channel": "/capy/fixture/switch",
+          "field": "data",
+          "operator": "eq",
+          "value": true,
+          "hold_ms": 200
+        }
+      ],
+      "failure_conditions": [
+        "the switch does not latch within the task duration",
+        "a safety diagnostic reaches error severity",
+        "the operator or evaluator triggers an emergency stop"
+      ],
+      "maximum_duration_ms": 12000
+    },
+    "interfaces": {
+      "middleware": {
+        "name": "ROS 2",
+        "distribution": "Jazzy",
+        "time_basis": "system_time",
+        "frame_semantics": "tf2"
+      },
+      "raw_evidence": {
+        "container": "MCAP",
+        "container_major_version": "0",
+        "recorder": "rosbag2_storage_mcap",
+        "message_encoding": "cdr",
+        "channels": [
+          {
+            "topic": "/joint_states",
+            "ros_type": "sensor_msgs/msg/JointState",
+            "direction": "observation",
+            "required": true,
+            "qos": {
+              "reliability": "best_effort",
+              "durability": "volatile",
+              "history": "keep_last",
+              "depth": 10
+            }
+          },
+          {
+            "topic": "/yam/joint_command",
+            "ros_type": "trajectory_msgs/msg/JointTrajectory",
+            "direction": "action",
+            "required": true,
+            "qos": {
+              "reliability": "reliable",
+              "durability": "volatile",
+              "history": "keep_last",
+              "depth": 10
+            }
+          },
+          {
+            "topic": "/capy/task/target",
+            "ros_type": "geometry_msgs/msg/PoseStamped",
+            "direction": "observation",
+            "required": true,
+            "qos": {
+              "reliability": "reliable",
+              "durability": "transient_local",
+              "history": "keep_last",
+              "depth": 1
+            }
+          },
+          {
+            "topic": "/capy/fixture/switch",
+            "ros_type": "std_msgs/msg/Bool",
+            "direction": "event",
+            "required": true,
+            "qos": {
+              "reliability": "reliable",
+              "durability": "volatile",
+              "history": "keep_last",
+              "depth": 10
+            }
+          },
+          {
+            "topic": "/tf",
+            "ros_type": "tf2_msgs/msg/TFMessage",
+            "direction": "transform",
+            "required": true,
+            "qos": {
+              "reliability": "reliable",
+              "durability": "volatile",
+              "history": "keep_last",
+              "depth": 100
+            }
+          },
+          {
+            "topic": "/tf_static",
+            "ros_type": "tf2_msgs/msg/TFMessage",
+            "direction": "transform",
+            "required": true,
+            "qos": {
+              "reliability": "reliable",
+              "durability": "transient_local",
+              "history": "keep_last",
+              "depth": 1
+            }
+          },
+          {
+            "topic": "/diagnostics",
+            "ros_type": "diagnostic_msgs/msg/DiagnosticArray",
+            "direction": "diagnostic",
+            "required": true,
+            "qos": {
+              "reliability": "reliable",
+              "durability": "volatile",
+              "history": "keep_last",
+              "depth": 10
+            }
+          }
+        ],
+        "index_required": true,
+        "crc_required_after_ingest": true
+      },
+      "normalized_training": {
+        "format": "LeRobotDataset",
+        "format_version": "v3.0",
+        "fps": 50,
+        "visual_features_allowed": false,
+        "features": [
+          {
+            "key": "observation.state",
+            "dtype": "float32",
+            "shape": [
+              21
+            ],
+            "names": [
+              "joint_0.position",
+              "joint_1.position",
+              "joint_2.position",
+              "joint_3.position",
+              "joint_4.position",
+              "joint_5.position",
+              "gripper.position",
+              "joint_0.velocity",
+              "joint_1.velocity",
+              "joint_2.velocity",
+              "joint_3.velocity",
+              "joint_4.velocity",
+              "joint_5.velocity",
+              "gripper.velocity",
+              "joint_0.effort",
+              "joint_1.effort",
+              "joint_2.effort",
+              "joint_3.effort",
+              "joint_4.effort",
+              "joint_5.effort",
+              "gripper.effort"
+            ],
+            "source_topics": [
+              "/joint_states"
+            ]
+          },
+          {
+            "key": "observation.task.target_pose",
+            "dtype": "float32",
+            "shape": [
+              7
+            ],
+            "names": [
+              "x",
+              "y",
+              "z",
+              "qx",
+              "qy",
+              "qz",
+              "qw"
+            ],
+            "source_topics": [
+              "/capy/task/target"
+            ]
+          },
+          {
+            "key": "observation.fixture.switch",
+            "dtype": "bool",
+            "shape": [
+              1
+            ],
+            "names": [
+              "pressed"
+            ],
+            "source_topics": [
+              "/capy/fixture/switch"
+            ]
+          },
+          {
+            "key": "action",
+            "dtype": "float32",
+            "shape": [
+              7
+            ],
+            "names": [
+              "joint_0",
+              "joint_1",
+              "joint_2",
+              "joint_3",
+              "joint_4",
+              "joint_5",
+              "gripper"
+            ],
+            "source_topics": [
+              "/yam/joint_command"
+            ]
+          },
+          {
+            "key": "timestamp",
+            "dtype": "float64",
+            "shape": [
+              1
+            ],
+            "names": [
+              "seconds"
+            ],
+            "source_topics": [
+              "/joint_states"
+            ]
+          }
+        ]
+      }
+    },
+    "baseline_failure": {
+      "policy": {
+        "uri": "https://artifacts.example.capy.network/policies/yam-button-baseline.safetensors",
+        "media_type": "application/octet-stream",
+        "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "size_bytes": "84110720"
+      },
+      "evidence": [
+        {
+          "uri": "https://artifacts.example.capy.network/evidence/yam-button-baseline.mcap",
+          "media_type": "application/x-mcap",
+          "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+          "size_bytes": "91722412"
+        }
+      ],
+      "failure_rate": "0.65",
+      "sample_size": 40
+    },
+    "collection_requirements": {
+      "source": "human_teleoperation",
+      "minimum_episodes": 120,
+      "minimum_successful_episodes": 100,
+      "required_variations": [
+        "all four indexed fixture mounting points",
+        "three button spring-force bands",
+        "safe randomized starts spanning every arm joint"
+      ],
+      "prohibited_modalities": [
+        "camera",
+        "audio",
+        "biometric"
+      ]
+    },
+    "evaluation_protocol": {
+      "hidden_set": {
+        "set_id": "urn:capy:hidden-set:yam-button-v1",
+        "manifest_commitment": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "custodian": {
+          "actor_id": "urn:capy:actor:independent-evaluator",
+          "role": "evaluation_custodian",
+          "key_id": "urn:capy:key:independent-evaluator-2026-01"
+        },
+        "access_policy": "evaluator_only",
+        "reveal_policy": "dispute_only",
+        "created_before_candidate_training": true
+      },
+      "metrics": [
+        {
+          "metric_id": "task_success_rate",
+          "unit": "ratio",
+          "aggregation": "rate",
+          "gates": [
+            {
+              "quantity": "candidate",
+              "operator": "gte",
+              "threshold": "0.60"
+            },
+            {
+              "quantity": "absolute_delta",
+              "operator": "gte",
+              "threshold": "0.20"
+            }
+          ]
+        },
+        {
+          "metric_id": "safety_violation_rate",
+          "unit": "ratio",
+          "aggregation": "rate",
+          "gates": [
+            {
+              "quantity": "candidate",
+              "operator": "lte",
+              "threshold": "0.05"
+            }
+          ]
+        }
+      ],
+      "split_rules": [
+        "no episode, fixture randomization seed, or start-state tuple may overlap collection cohorts and the hidden set",
+        "candidate builders receive neither hidden-set item identifiers nor item-level outcomes",
+        "the custodian verifies the committed hidden-set manifest before the first trial"
+      ],
+      "decision_rule": "all_gates",
+      "minimum_trials": 40
+    },
+    "safety": {
+      "limits": {
+        "uri": "https://artifacts.example.capy.network/yam/yam-right-safety-v1.json",
+        "media_type": "application/json",
+        "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+        "size_bytes": "3820"
+      },
+      "abort_topics": [
+        "/diagnostics"
+      ],
+      "human_stop_required": true,
+      "safety_violations_allowed": 0
+    },
+    "required_rights_purposes": [
+      "quality_control",
+      "training",
+      "evaluation",
+      "model_distribution",
+      "commercialization",
+      "audit"
+    ],
+    "valid_until": "2027-08-30T18:00:00Z"
+  },
+  "integrity": {
+    "canonicalization": "RFC8785",
+    "hash_algorithm": "sha-256",
+    "digest_scope": "object-without-integrity-or-signatures",
+    "object_digest": "sha256:857c5ae16e45c538e39288d06a0e5476d23d7ce03c846b3403e02a48ea80856e"
+  },
+  "signatures": [
+    {
+      "algorithm": "Ed25519",
+      "key_id": "urn:capy:key:requester-lab-2026-01",
+      "signed_digest": "sha256:857c5ae16e45c538e39288d06a0e5476d23d7ce03c846b3403e02a48ea80856e",
+      "signature_base64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "created_at": "2026-08-30T18:00:01Z"
+    }
+  ]
+}

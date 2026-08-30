@@ -1,0 +1,146 @@
+{
+  "$schema": "https://capy.network/schemas/v1/attribution-result.schema.json",
+  "protocol_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "object_type": "attribution_result",
+  "object_id": "urn:uuid:44444444-4444-4444-8444-444444444444",
+  "issued_at": "2026-09-05T21:00:00Z",
+  "payload": {
+    "evaluation_receipt": {
+      "object_id": "urn:uuid:33333333-3333-4333-8333-333333333333",
+      "object_type": "evaluation_receipt",
+      "object_digest": "sha256:8b1d8ce6525021f41bc5c8030310bb634a085c615c3e4a4f73ee05b865fb16a1"
+    },
+    "attributor": {
+      "actor_id": "urn:capy:actor:attribution-service",
+      "role": "attributor",
+      "key_id": "urn:capy:key:attribution-service-2026-01"
+    },
+    "computed_at": "2026-09-05T20:55:00Z",
+    "method": {
+      "name": "contract_defined",
+      "version": "1.0.0",
+      "implementation": {
+        "uri": "https://artifacts.example.capy.network/attribution/yam-button-contributor-split-v1.wasm",
+        "media_type": "application/wasm",
+        "digest": "sha256:2929292929292929292929292929292929292929292929292929292929292929",
+        "size_bytes": "187442"
+      },
+      "score_semantics": "the cohort receives the verified capability-gain pool; its signed collection agreement assigns 75 percent to the operator and 25 percent to the environment and hardware provider.",
+      "negative_score_policy": "clamp_to_zero",
+      "randomness": {
+        "deterministic": true,
+        "seed_commitment": "sha256:3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a"
+      }
+    },
+    "input_cohorts": [
+      {
+        "object_id": "urn:uuid:22222222-2222-4222-8222-222222222222",
+        "object_type": "episode_cohort",
+        "object_digest": "sha256:8c730dc05861f9c80beda42585517cabd72cfa921bcc90557061d0b7f765327c"
+      }
+    ],
+    "allocations": [
+      {
+        "allocation_id": "alloc-operator-17",
+        "contributor_id": "urn:capy:contributor:operator-17",
+        "cohort": {
+          "object_id": "urn:uuid:22222222-2222-4222-8222-222222222222",
+          "object_type": "episode_cohort",
+          "object_digest": "sha256:8c730dc05861f9c80beda42585517cabd72cfa921bcc90557061d0b7f765327c"
+        },
+        "roles": [
+          "operator"
+        ],
+        "raw_score": "0.75",
+        "weight_ppm": 750000,
+        "payout_amount_base_units": "75000000",
+        "eligibility": {
+          "eligible": true,
+          "rights_valid": true,
+          "consent_valid": true,
+          "revocation_status": "active",
+          "checked_at": "2026-09-05T20:45:00Z",
+          "registry_snapshot_digest": "sha256:9191919191919191919191919191919191919191919191919191919191919191",
+          "reasons": [
+            "all required grants and consent scopes were active at the attribution cutoff"
+          ]
+        }
+      },
+      {
+        "allocation_id": "alloc-fixture-lab",
+        "contributor_id": "urn:capy:contributor:fixture-lab",
+        "cohort": {
+          "object_id": "urn:uuid:22222222-2222-4222-8222-222222222222",
+          "object_type": "episode_cohort",
+          "object_digest": "sha256:8c730dc05861f9c80beda42585517cabd72cfa921bcc90557061d0b7f765327c"
+        },
+        "roles": [
+          "environment_provider",
+          "hardware_provider"
+        ],
+        "raw_score": "0.25",
+        "weight_ppm": 250000,
+        "payout_amount_base_units": "25000000",
+        "eligibility": {
+          "eligible": true,
+          "rights_valid": true,
+          "consent_valid": true,
+          "revocation_status": "active",
+          "checked_at": "2026-09-05T20:45:00Z",
+          "registry_snapshot_digest": "sha256:9191919191919191919191919191919191919191919191919191919191919191",
+          "reasons": [
+            "all required grants and property-controller consent scopes were active at the attribution cutoff"
+          ]
+        }
+      }
+    ],
+    "payout_pool": {
+      "asset": "USDC",
+      "mint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "decimals": 6,
+      "amount_base_units": "100000000"
+    },
+    "conservation": {
+      "total_weight_ppm": 1000000,
+      "allocated_base_units": "100000000",
+      "unallocated_base_units": "0",
+      "rounding_policy": "largest_remainder"
+    },
+    "reproducibility": {
+      "input_snapshot": {
+        "uri": "https://artifacts.example.capy.network/attribution/yam-button-001-input.json",
+        "media_type": "application/json",
+        "digest": "sha256:a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2",
+        "size_bytes": "27112"
+      },
+      "counterfactual_results": {
+        "uri": "https://artifacts.example.capy.network/attribution/yam-button-001-counterfactuals.parquet",
+        "media_type": "application/vnd.apache.parquet",
+        "digest": "sha256:b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3",
+        "size_bytes": "28419"
+      },
+      "calculation_trace": {
+        "uri": "https://artifacts.example.capy.network/attribution/yam-button-001-trace.json",
+        "media_type": "application/json",
+        "digest": "sha256:c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4",
+        "size_bytes": "9881"
+      }
+    }
+  },
+  "integrity": {
+    "canonicalization": "RFC8785",
+    "hash_algorithm": "sha-256",
+    "digest_scope": "object-without-integrity-or-signatures",
+    "object_digest": "sha256:73285bc2bcf854dfdb709eefce073cdb852e4cf7e1a7163c9a1ed4e4ffcd9df4"
+  },
+  "signatures": [
+    {
+      "algorithm": "Ed25519",
+      "key_id": "urn:capy:key:attribution-service-2026-01",
+      "signed_digest": "sha256:73285bc2bcf854dfdb709eefce073cdb852e4cf7e1a7163c9a1ed4e4ffcd9df4",
+      "signature_base64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "created_at": "2026-09-05T21:00:01Z"
+    }
+  ]
+}

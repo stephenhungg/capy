@@ -1,13 +1,16 @@
 {
-  "name": "capy-experience-network",
+  "name": "capy",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test:protocol",
+    "test:protocol": "node scripts/validate-protocol.mjs"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",
@@ -21,6 +24,9 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "canonicalize": "2.1.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "16.3.3",
     "tailwindcss": "4.3.3",

@@ -1,0 +1,357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/v1/capability-manifest.schema.json",
+  "title": "capy capability manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "protocol_version",
+    "schema_version",
+    "object_type",
+    "object_id",
+    "issued_at",
+    "payload",
+    "integrity",
+    "signatures"
+  ],
+  "properties": {
+    "$schema": {"const": "https://capy.network/schemas/v1/capability-manifest.schema.json"},
+    "protocol_version": {"const": "1.0.0"},
+    "schema_version": {"const": "1.0.0"},
+    "object_type": {"const": "capability_manifest"},
+    "object_id": {"type": "string", "format": "uri"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "supersedes": {"$ref": "common.schema.json#/$defs/capabilityReference"},
+    "payload": {"$ref": "#/$defs/payload"},
+    "integrity": {"$ref": "common.schema.json#/$defs/integrity"},
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "common.schema.json#/$defs/signature"}
+    }
+  },
+  "$defs": {
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "summary",
+        "requester",
+        "embodiment",
+        "task",
+        "interfaces",
+        "baseline_failure",
+        "collection_requirements",
+        "evaluation_protocol",
+        "safety",
+        "required_rights_purposes",
+        "valid_until"
+      ],
+      "properties": {
+        "title": {"type": "string", "minLength": 1, "maxLength": 160},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "requester": {"$ref": "common.schema.json#/$defs/actor"},
+        "embodiment": {"$ref": "#/$defs/embodiment"},
+        "task": {"$ref": "#/$defs/task"},
+        "interfaces": {"$ref": "#/$defs/interfaces"},
+        "baseline_failure": {"$ref": "#/$defs/baselineFailure"},
+        "collection_requirements": {"$ref": "#/$defs/collectionRequirements"},
+        "evaluation_protocol": {"$ref": "#/$defs/evaluationProtocol"},
+        "safety": {"$ref": "#/$defs/safety"},
+        "required_rights_purposes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["quality_control", "training", "evaluation", "benchmarking", "model_distribution", "commercialization", "audit"]
+          }
+        },
+        "valid_until": {"type": "string", "format": "date-time"}
+      }
+    },
+    "embodiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manufacturer", "model", "configuration_id", "description_artifacts", "controlled_joints", "base_frame", "tool_frame"],
+      "properties": {
+        "manufacturer": {"type": "string", "minLength": 1, "maxLength": 128},
+        "model": {"type": "string", "minLength": 1, "maxLength": 128},
+        "configuration_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "description_artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "common.schema.json#/$defs/artifactReference"}
+        },
+        "controlled_joints": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 128}
+        },
+        "base_frame": {"type": "string", "minLength": 1, "maxLength": 128},
+        "tool_frame": {"type": "string", "minLength": 1, "maxLength": 128}
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instruction", "workspace", "initial_conditions", "success_conditions", "failure_conditions", "maximum_duration_ms"],
+      "properties": {
+        "instruction": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "workspace": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "initial_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1, "maxLength": 512}
+        },
+        "success_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/signalCondition"}
+        },
+        "failure_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1, "maxLength": 512}
+        },
+        "maximum_duration_ms": {"type": "integer", "minimum": 1, "maximum": 3600000}
+      }
+    },
+    "signalCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel", "field", "operator", "value", "hold_ms"],
+      "properties": {
+        "channel": {"type": "string", "pattern": "^/"},
+        "field": {"type": "string", "minLength": 1, "maxLength": 128},
+        "operator": {"enum": ["eq", "ne", "lt", "lte", "gt", "gte"]},
+        "value": {"type": ["boolean", "string", "integer"]},
+        "hold_ms": {"type": "integer", "minimum": 0, "maximum": 3600000}
+      }
+    },
+    "interfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["middleware", "raw_evidence", "normalized_training"],
+      "properties": {
+        "middleware": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "distribution", "time_basis", "frame_semantics"],
+          "properties": {
+            "name": {"const": "ROS 2"},
+            "distribution": {"type": "string", "minLength": 1, "maxLength": 64},
+            "time_basis": {"enum": ["system_time", "ros_time"]},
+            "frame_semantics": {"const": "tf2"}
+          }
+        },
+        "raw_evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["container", "container_major_version", "recorder", "message_encoding", "channels", "index_required", "crc_required_after_ingest"],
+          "properties": {
+            "container": {"const": "MCAP"},
+            "container_major_version": {"const": "0"},
+            "recorder": {"const": "rosbag2_storage_mcap"},
+            "message_encoding": {"enum": ["cdr", "protobuf", "json"]},
+            "channels": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/channel"}
+            },
+            "index_required": {"const": true},
+            "crc_required_after_ingest": {"const": true}
+          }
+        },
+        "normalized_training": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["format", "format_version", "fps", "visual_features_allowed", "features"],
+          "properties": {
+            "format": {"const": "LeRobotDataset"},
+            "format_version": {"const": "v3.0"},
+            "fps": {"type": "integer", "minimum": 1, "maximum": 1000},
+            "visual_features_allowed": {"type": "boolean"},
+            "features": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/feature"}
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "required": ["visual_features_allowed"],
+                "properties": {"visual_features_allowed": {"const": false}}
+              },
+              "then": {
+                "properties": {
+                  "features": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "not": {
+                        "anyOf": [
+                          {"required": ["dtype"], "properties": {"dtype": {"enum": ["image", "video"]}}},
+                          {"required": ["key"], "properties": {"key": {"type": "string", "pattern": "^observation\\.images\\."}}}
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["topic", "ros_type", "direction", "required", "qos"],
+      "properties": {
+        "topic": {"type": "string", "pattern": "^/"},
+        "ros_type": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*/msg/[A-Za-z][A-Za-z0-9_]*$"},
+        "direction": {"enum": ["observation", "action", "event", "transform", "diagnostic"]},
+        "required": {"type": "boolean"},
+        "qos": {"$ref": "common.schema.json#/$defs/qosProfile"}
+      }
+    },
+    "feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "dtype", "shape", "source_topics"],
+      "properties": {
+        "key": {"type": "string", "pattern": "^[a-z][a-z0-9._-]*$"},
+        "dtype": {"enum": ["bool", "int32", "int64", "float32", "float64", "string", "image", "video"]},
+        "shape": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "names": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 128}
+        },
+        "source_topics": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^/"}
+        }
+      }
+    },
+    "baselineFailure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "evidence", "failure_rate", "sample_size"],
+      "properties": {
+        "policy": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "common.schema.json#/$defs/artifactReference"}
+        },
+        "failure_rate": {"$ref": "common.schema.json#/$defs/decimal"},
+        "sample_size": {"type": "integer", "minimum": 1}
+      }
+    },
+    "collectionRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "minimum_episodes", "minimum_successful_episodes", "required_variations", "prohibited_modalities"],
+      "properties": {
+        "source": {"enum": ["human_teleoperation", "robot_autonomy", "simulation", "mixed"]},
+        "minimum_episodes": {"type": "integer", "minimum": 1},
+        "minimum_successful_episodes": {"type": "integer", "minimum": 1},
+        "required_variations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 256}
+        },
+        "prohibited_modalities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["camera", "audio", "biometric"]}
+        }
+      }
+    },
+    "evaluationProtocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hidden_set", "metrics", "split_rules", "decision_rule", "minimum_trials"],
+      "properties": {
+        "hidden_set": {"$ref": "#/$defs/hiddenSet"},
+        "metrics": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/metricDefinition"}
+        },
+        "split_rules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 512}
+        },
+        "decision_rule": {"enum": ["all_gates", "any_gate", "weighted_score"]},
+        "minimum_trials": {"type": "integer", "minimum": 1}
+      }
+    },
+    "hiddenSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["set_id", "manifest_commitment", "custodian", "access_policy", "reveal_policy", "created_before_candidate_training"],
+      "properties": {
+        "set_id": {"type": "string", "format": "uri"},
+        "manifest_commitment": {"$ref": "common.schema.json#/$defs/sha256Digest"},
+        "custodian": {"$ref": "common.schema.json#/$defs/actor"},
+        "access_policy": {"const": "evaluator_only"},
+        "reveal_policy": {"enum": ["never", "after_program_close", "dispute_only"]},
+        "created_before_candidate_training": {"const": true}
+      }
+    },
+    "metricDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_id", "unit", "aggregation", "gates"],
+      "properties": {
+        "metric_id": {"type": "string", "pattern": "^[a-z][a-z0-9._-]*$"},
+        "unit": {"type": "string", "minLength": 1, "maxLength": 64},
+        "aggregation": {"enum": ["mean", "rate", "median", "p95", "sum"]},
+        "gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/metricGate"}
+        }
+      }
+    },
+    "metricGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["quantity", "operator", "threshold"],
+      "properties": {
+        "quantity": {"enum": ["candidate", "absolute_delta", "relative_delta", "baseline"]},
+        "operator": {"enum": ["lt", "lte", "gt", "gte", "eq"]},
+        "threshold": {"$ref": "common.schema.json#/$defs/decimal"}
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["limits", "abort_topics", "human_stop_required", "safety_violations_allowed"],
+      "properties": {
+        "limits": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "abort_topics": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^/"}
+        },
+        "human_stop_required": {"const": true},
+        "safety_violations_allowed": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

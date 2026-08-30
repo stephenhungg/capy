@@ -1,20 +1,29 @@
-# forma studio recreation
+# capy foundation
 
-- [x] capture desktop, tablet, and mobile reference screenshots
-- [x] inventory page copy, media, fonts, colors, spacing, and component geometry
-- [x] document hover, cursor, load, and scroll-driven motion behavior
-- [x] scaffold next.js, typescript, tailwind css, gsap, and @gsap/react
-- [x] implement the responsive page structure and visual styling
-- [x] implement entrance, hover, menu, odometer, reveal, sticky, and scroll sequences in gsap
-- [x] compare reference and local renders at matching viewports and iterate
-- [x] verify reduced-motion behavior, console/network health, lint, typecheck, and production build
+## completed foundations
 
-## review
+- [x] preserve and verify the existing capy marketing site
+- [x] define capy protocol v1, canonical schemas, and a linked camera-free YAM example chain
+- [ ] integrate the camera-free i2rt recorder
+- [ ] integrate the falsifiable YAM evaluation laboratory
+- [ ] integrate the Solana `USDC` payout rail
+- [ ] integrate the bounty compiler and cohort attribution engine
+- [ ] integrate the VIMA / World Context evidence bridge
+- [ ] integrate rights, privacy, provenance, and governance contracts
+- [ ] integrate the 90-day category strategy and risk register
 
-- desktop geometry matches the 1440 x 900 reference at 10,736 px total height, including every section boundary
-- phone geometry matches the 390 x 844 reference at 15,264 px total height, including every section boundary
-- confirmed there is no source marquee, hero parallax, image zoom, or autonomous testimonial playback to recreate
-- verified menu open/close and body lock, faq accordion state, testimonial navigation, project metadata hover, navigation roll, sticky hero/header, and stacked service cards
-- verified 1024 px tablet rendering without horizontal overflow and confirmed the reduced-motion GSAP/CSS fallback path
-- verified a fresh browser context has no console errors and all local requests return 200/304
-- `npm run typecheck`, `npm run lint`, and `npm run build` pass
+## production web platform
+
+- [ ] scaffold the production Sites application with shadcn, authentication, D1, and R2
+- [ ] implement multi-tenant organizations, memberships, and role-aware navigation
+- [ ] implement buyer capability requests and funded collection jobs
+- [ ] implement contributor job discovery, submissions, quality status, and payouts
+- [ ] implement evaluator hidden-trial workflow and capability receipts
+- [ ] implement operator review, audit, dispute, and treasury surfaces
+- [ ] connect the camera-free i2rt edge-agent contract
+- [ ] connect bounty, evaluation, receipt, and Solana payout services
+- [ ] validate, deploy, and operate the first permanent end-to-end workflow
+
+## product rule
+
+the fixed-geometry YAM experiment is the first production workflow inside capy, not a standalone demo. early code must remain reusable platform infrastructure with durable data, real authorization, inspectable evidence, and production operations.

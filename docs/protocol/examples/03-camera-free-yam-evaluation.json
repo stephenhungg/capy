@@ -1,0 +1,239 @@
+{
+  "$schema": "https://capy.network/schemas/v1/evaluation-receipt.schema.json",
+  "protocol_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "object_type": "evaluation_receipt",
+  "object_id": "urn:uuid:33333333-3333-4333-8333-333333333333",
+  "issued_at": "2026-09-05T19:45:00Z",
+  "payload": {
+    "capability": {
+      "object_id": "urn:uuid:11111111-1111-4111-8111-111111111111",
+      "object_type": "capability_manifest",
+      "object_digest": "sha256:857c5ae16e45c538e39288d06a0e5476d23d7ce03c846b3403e02a48ea80856e"
+    },
+    "evaluator": {
+      "actor_id": "urn:capy:actor:independent-evaluator",
+      "role": "evaluator",
+      "key_id": "urn:capy:key:independent-evaluator-2026-01"
+    },
+    "evaluated_at": "2026-09-05T19:30:00Z",
+    "baseline_policy": {
+      "policy_id": "urn:capy:policy:yam-button-baseline",
+      "artifact": {
+        "uri": "https://artifacts.example.capy.network/policies/yam-button-baseline.safetensors",
+        "media_type": "application/octet-stream",
+        "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "size_bytes": "84110720"
+      },
+      "code_revision": "sha256:6767676767676767676767676767676767676767676767676767676767676767",
+      "configuration": {
+        "uri": "https://artifacts.example.capy.network/training/yam-button-baseline-config.json",
+        "media_type": "application/json",
+        "digest": "sha256:7878787878787878787878787878787878787878787878787878787878787878",
+        "size_bytes": "4211"
+      },
+      "training_run": {
+        "uri": "https://artifacts.example.capy.network/training/yam-button-baseline-run.json",
+        "media_type": "application/json",
+        "digest": "sha256:8989898989898989898989898989898989898989898989898989898989898989",
+        "size_bytes": "13752"
+      }
+    },
+    "candidate_policy": {
+      "policy_id": "urn:capy:policy:yam-button-candidate-001",
+      "artifact": {
+        "uri": "https://artifacts.example.capy.network/policies/yam-button-candidate-001.safetensors",
+        "media_type": "application/octet-stream",
+        "digest": "sha256:9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a",
+        "size_bytes": "84110720"
+      },
+      "code_revision": "sha256:abababababababababababababababababababababababababababababababab",
+      "configuration": {
+        "uri": "https://artifacts.example.capy.network/training/yam-button-candidate-001-config.json",
+        "media_type": "application/json",
+        "digest": "sha256:bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc",
+        "size_bytes": "4388"
+      },
+      "training_run": {
+        "uri": "https://artifacts.example.capy.network/training/yam-button-candidate-001-run.json",
+        "media_type": "application/json",
+        "digest": "sha256:cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "size_bytes": "14933"
+      }
+    },
+    "training_cohorts": [
+      {
+        "object_id": "urn:uuid:22222222-2222-4222-8222-222222222222",
+        "object_type": "episode_cohort",
+        "object_digest": "sha256:8c730dc05861f9c80beda42585517cabd72cfa921bcc90557061d0b7f765327c"
+      }
+    ],
+    "eligibility_snapshot": [
+      {
+        "cohort": {
+          "object_id": "urn:uuid:22222222-2222-4222-8222-222222222222",
+          "object_type": "episode_cohort",
+          "object_digest": "sha256:8c730dc05861f9c80beda42585517cabd72cfa921bcc90557061d0b7f765327c"
+        },
+        "rights_valid": true,
+        "consent_valid": true,
+        "revocation_status": "active",
+        "checked_at": "2026-09-05T17:00:00Z",
+        "registry_snapshot_digest": "sha256:9090909090909090909090909090909090909090909090909090909090909090"
+      }
+    ],
+    "hidden_set": {
+      "set_id": "urn:capy:hidden-set:yam-button-v1",
+      "manifest_commitment": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "custodian": {
+        "actor_id": "urn:capy:actor:independent-evaluator",
+        "role": "evaluation_custodian",
+        "key_id": "urn:capy:key:independent-evaluator-2026-01"
+      },
+      "candidate_access": false,
+      "training_overlap_detected": false,
+      "access_log": {
+        "uri": "https://sealed.example.capy.network/evaluations/yam-button-001/access-log.json",
+        "media_type": "application/json",
+        "digest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "size_bytes": "11942",
+        "encryption": {
+          "scheme": "age-x25519",
+          "key_reference": "urn:capy:kms:hidden-evaluation-custodian"
+        }
+      },
+      "item_level_results": {
+        "uri": "https://sealed.example.capy.network/evaluations/yam-button-001/item-results.parquet",
+        "media_type": "application/vnd.apache.parquet",
+        "digest": "sha256:b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2",
+        "size_bytes": "48511",
+        "encryption": {
+          "scheme": "age-x25519",
+          "key_reference": "urn:capy:kms:hidden-evaluation-custodian"
+        }
+      },
+      "reveal_status": "sealed"
+    },
+    "execution": {
+      "run_id": "urn:capy:evaluation-run:yam-button-001",
+      "harness": {
+        "uri": "https://artifacts.example.capy.network/evaluation/yam-button-harness-v1.py",
+        "media_type": "text/x-python",
+        "digest": "sha256:c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+        "size_bytes": "23980"
+      },
+      "hardware_configuration": {
+        "uri": "https://sealed.example.capy.network/evaluations/yam-button-001/hardware.json",
+        "media_type": "application/json",
+        "digest": "sha256:d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4",
+        "size_bytes": "8901",
+        "encryption": {
+          "scheme": "age-x25519",
+          "key_reference": "urn:capy:kms:hidden-evaluation-custodian"
+        }
+      },
+      "software_environment": {
+        "uri": "https://artifacts.example.capy.network/evaluation/yam-button-env.lock",
+        "media_type": "text/plain",
+        "digest": "sha256:e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5",
+        "size_bytes": "184412"
+      },
+      "random_seed_commitment": "sha256:f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6",
+      "trial_count": 40,
+      "raw_logs": [
+        {
+          "uri": "https://sealed.example.capy.network/evaluations/yam-button-001/raw.mcap",
+          "media_type": "application/x-mcap",
+          "digest": "sha256:0707070707070707070707070707070707070707070707070707070707070707",
+          "size_bytes": "312244109",
+          "encryption": {
+            "scheme": "age-x25519",
+            "key_reference": "urn:capy:kms:hidden-evaluation-custodian"
+          }
+        }
+      ]
+    },
+    "metrics": [
+      {
+        "metric_id": "task_success_rate",
+        "unit": "ratio",
+        "sample_size": 40,
+        "baseline": "0.35",
+        "candidate": "0.75",
+        "absolute_delta": "0.40",
+        "confidence_interval_95": {
+          "lower": "0.18",
+          "upper": "0.57",
+          "method": "paired bootstrap over committed trials"
+        },
+        "gates": [
+          {
+            "quantity": "candidate",
+            "operator": "gte",
+            "threshold": "0.60",
+            "observed": "0.75",
+            "passed": true
+          },
+          {
+            "quantity": "absolute_delta",
+            "operator": "gte",
+            "threshold": "0.20",
+            "observed": "0.40",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "metric_id": "safety_violation_rate",
+        "unit": "ratio",
+        "sample_size": 40,
+        "baseline": "0.025",
+        "candidate": "0.00",
+        "absolute_delta": "-0.025",
+        "gates": [
+          {
+            "quantity": "candidate",
+            "operator": "lte",
+            "threshold": "0.05",
+            "observed": "0.00",
+            "passed": true
+          }
+        ]
+      }
+    ],
+    "safety": {
+      "violation_count": 0,
+      "emergency_stop_count": 0,
+      "passed": true,
+      "report": {
+        "uri": "https://artifacts.example.capy.network/evaluation/yam-button-001-safety.json",
+        "media_type": "application/json",
+        "digest": "sha256:1818181818181818181818181818181818181818181818181818181818181818",
+        "size_bytes": "7002"
+      }
+    },
+    "decision": {
+      "rule": "all_gates",
+      "passed": true,
+      "reasons": [
+        "candidate success rate and absolute improvement both exceeded the committed gates",
+        "the candidate recorded no safety violations on the hidden set"
+      ]
+    }
+  },
+  "integrity": {
+    "canonicalization": "RFC8785",
+    "hash_algorithm": "sha-256",
+    "digest_scope": "object-without-integrity-or-signatures",
+    "object_digest": "sha256:8b1d8ce6525021f41bc5c8030310bb634a085c615c3e4a4f73ee05b865fb16a1"
+  },
+  "signatures": [
+    {
+      "algorithm": "Ed25519",
+      "key_id": "urn:capy:key:independent-evaluator-2026-01",
+      "signed_digest": "sha256:8b1d8ce6525021f41bc5c8030310bb634a085c615c3e4a4f73ee05b865fb16a1",
+      "signature_base64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "created_at": "2026-09-05T19:45:01Z"
+    }
+  ]
+}

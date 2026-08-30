@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/v1/episode-cohort.schema.json",
+  "title": "capy episode cohort",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "protocol_version",
+    "schema_version",
+    "object_type",
+    "object_id",
+    "issued_at",
+    "payload",
+    "integrity",
+    "signatures"
+  ],
+  "properties": {
+    "$schema": {"const": "https://capy.network/schemas/v1/episode-cohort.schema.json"},
+    "protocol_version": {"const": "1.0.0"},
+    "schema_version": {"const": "1.0.0"},
+    "object_type": {"const": "episode_cohort"},
+    "object_id": {"type": "string", "format": "uri"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "supersedes": {"$ref": "common.schema.json#/$defs/cohortReference"},
+    "payload": {"$ref": "#/$defs/payload"},
+    "integrity": {"$ref": "common.schema.json#/$defs/integrity"},
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "common.schema.json#/$defs/signature"}
+    }
+  },
+  "$defs": {
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability",
+        "collection_job_id",
+        "collector",
+        "status",
+        "collection_window",
+        "contributors",
+        "episode_set",
+        "raw_recordings",
+        "normalized_dataset",
+        "quality",
+        "rights",
+        "consent",
+        "revocation",
+        "privacy"
+      ],
+      "properties": {
+        "capability": {"$ref": "common.schema.json#/$defs/capabilityReference"},
+        "collection_job_id": {"type": "string", "format": "uri"},
+        "collector": {"$ref": "common.schema.json#/$defs/actor"},
+        "status": {"enum": ["accepted", "quarantined", "rejected"]},
+        "collection_window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["started_at", "ended_at"],
+          "properties": {
+            "started_at": {"type": "string", "format": "date-time"},
+            "ended_at": {"type": "string", "format": "date-time"}
+          }
+        },
+        "contributors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/contributor"}
+        },
+        "episode_set": {"$ref": "#/$defs/episodeSet"},
+        "raw_recordings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/rawRecording"}
+        },
+        "normalized_dataset": {"$ref": "#/$defs/normalizedDataset"},
+        "quality": {"$ref": "#/$defs/quality"},
+        "rights": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "common.schema.json#/$defs/rightsBundle"}
+        },
+        "consent": {"$ref": "common.schema.json#/$defs/consentBundle"},
+        "revocation": {"$ref": "common.schema.json#/$defs/revocationStatus"},
+        "privacy": {"$ref": "#/$defs/privacy"}
+      }
+    },
+    "contributor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contributor_id", "actor", "roles", "episode_count", "episode_ids_digest", "episode_assignment", "payout_eligible"],
+      "properties": {
+        "contributor_id": {"type": "string", "format": "uri"},
+        "actor": {"$ref": "common.schema.json#/$defs/actor"},
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["operator", "collector", "annotator", "hardware_provider", "environment_provider"]}
+        },
+        "episode_count": {"type": "integer", "minimum": 1},
+        "episode_ids_digest": {"$ref": "common.schema.json#/$defs/sha256Digest"},
+        "episode_assignment": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "payout_eligible": {"type": "boolean"}
+      }
+    },
+    "episodeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["episode_count", "successful_episode_count", "episode_ids_digest", "episode_manifest"],
+      "properties": {
+        "episode_count": {"type": "integer", "minimum": 1},
+        "successful_episode_count": {"type": "integer", "minimum": 0},
+        "episode_ids_digest": {"$ref": "common.schema.json#/$defs/sha256Digest"},
+        "episode_manifest": {"$ref": "common.schema.json#/$defs/artifactReference"}
+      }
+    },
+    "rawRecording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "artifact",
+        "container",
+        "container_major_version",
+        "message_encoding",
+        "ros_distribution",
+        "topics_digest",
+        "clock_basis",
+        "indexed",
+        "crc_verified"
+      ],
+      "properties": {
+        "recording_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "artifact": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "container": {"const": "MCAP"},
+        "container_major_version": {"const": "0"},
+        "message_encoding": {"enum": ["cdr", "protobuf", "json"]},
+        "ros_distribution": {"type": "string", "minLength": 1, "maxLength": 64},
+        "topics_digest": {"$ref": "common.schema.json#/$defs/sha256Digest"},
+        "clock_basis": {"enum": ["system_time", "ros_time"]},
+        "indexed": {"const": true},
+        "crc_verified": {"const": true}
+      }
+    },
+    "normalizedDataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact",
+        "format",
+        "format_version",
+        "producer",
+        "dataset_revision",
+        "fps",
+        "use_videos",
+        "features",
+        "source_recording_digests",
+        "normalization_transform"
+      ],
+      "properties": {
+        "artifact": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "format": {"const": "LeRobotDataset"},
+        "format_version": {"const": "v3.0"},
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["package", "package_version", "source_revision"],
+          "properties": {
+            "package": {"const": "lerobot"},
+            "package_version": {"$ref": "common.schema.json#/$defs/semver"},
+            "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+          }
+        },
+        "dataset_revision": {"$ref": "common.schema.json#/$defs/sha256Digest"},
+        "fps": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "use_videos": {"type": "boolean"},
+        "features": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/datasetFeature"}
+        },
+        "source_recording_digests": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "common.schema.json#/$defs/sha256Digest"}
+        },
+        "normalization_transform": {"$ref": "common.schema.json#/$defs/artifactReference"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["use_videos"],
+            "properties": {"use_videos": {"const": false}}
+          },
+          "then": {
+            "properties": {
+              "features": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "not": {
+                    "anyOf": [
+                      {"required": ["dtype"], "properties": {"dtype": {"enum": ["image", "video"]}}},
+                      {"required": ["key"], "properties": {"key": {"type": "string", "pattern": "^observation\\.images\\."}}}
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "datasetFeature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "dtype", "shape"],
+      "properties": {
+        "key": {"type": "string", "pattern": "^[a-z][a-z0-9._-]*$"},
+        "dtype": {"enum": ["bool", "int32", "int64", "float32", "float64", "string", "image", "video"]},
+        "shape": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "names": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 128}
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["validator_version", "timestamp_monotonicity", "required_topics_present", "action_state_alignment_ms_p95", "rejected_episode_ids", "report"],
+      "properties": {
+        "validator_version": {"$ref": "common.schema.json#/$defs/semver"},
+        "timestamp_monotonicity": {"const": true},
+        "required_topics_present": {"const": true},
+        "action_state_alignment_ms_p95": {"$ref": "common.schema.json#/$defs/decimal"},
+        "rejected_episode_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 128}
+        },
+        "report": {"$ref": "common.schema.json#/$defs/artifactReference"}
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["camera_free", "audio_free", "direct_identifiers_removed", "onchain_personal_data_prohibited"],
+      "properties": {
+        "camera_free": {"type": "boolean"},
+        "audio_free": {"type": "boolean"},
+        "direct_identifiers_removed": {"type": "boolean"},
+        "onchain_personal_data_prohibited": {"const": true}
+      }
+    }
+  }
+}

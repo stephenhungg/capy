@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/v1/solana-payout-manifest.schema.json",
+  "title": "capy solana payout manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "protocol_version",
+    "schema_version",
+    "object_type",
+    "object_id",
+    "issued_at",
+    "payload",
+    "integrity",
+    "signatures"
+  ],
+  "properties": {
+    "$schema": {"const": "https://capy.network/schemas/v1/solana-payout-manifest.schema.json"},
+    "protocol_version": {"const": "1.0.0"},
+    "schema_version": {"const": "1.0.0"},
+    "object_type": {"const": "solana_payout_manifest"},
+    "object_id": {"type": "string", "format": "uri"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "supersedes": {"$ref": "common.schema.json#/$defs/payoutReference"},
+    "payload": {"$ref": "#/$defs/payload"},
+    "integrity": {"$ref": "common.schema.json#/$defs/integrity"},
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "common.schema.json#/$defs/signature"}
+    }
+  },
+  "$defs": {
+    "base58Address": {
+      "type": "string",
+      "pattern": "^[1-9A-HJ-NP-Za-km-z]{32,44}$"
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attribution_result",
+        "payout_authority",
+        "cluster",
+        "asset",
+        "treasury",
+        "transfers",
+        "totals",
+        "transaction_plan",
+        "execution_policy",
+        "settlement",
+        "privacy"
+      ],
+      "properties": {
+        "attribution_result": {"$ref": "common.schema.json#/$defs/attributionReference"},
+        "payout_authority": {"$ref": "common.schema.json#/$defs/actor"},
+        "cluster": {"$ref": "#/$defs/cluster"},
+        "asset": {"$ref": "#/$defs/asset"},
+        "treasury": {"$ref": "#/$defs/treasury"},
+        "transfers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/transfer"}
+        },
+        "totals": {"$ref": "#/$defs/totals"},
+        "transaction_plan": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/transactionBatch"}
+        },
+        "execution_policy": {"$ref": "#/$defs/executionPolicy"},
+        "settlement": {"$ref": "#/$defs/settlement"},
+        "privacy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["personal_data_onchain", "onchain_fields"],
+          "properties": {
+            "personal_data_onchain": {"const": false},
+            "onchain_fields": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"enum": ["wallet_addresses", "token_amounts", "manifest_object_id", "transaction_signatures"]}
+            }
+          }
+        }
+      }
+    },
+    "cluster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "genesis_hash", "rpc_reference"],
+      "properties": {
+        "name": {"enum": ["mainnet-beta", "devnet", "testnet", "localnet"]},
+        "genesis_hash": {"$ref": "#/$defs/base58Address"},
+        "rpc_reference": {"type": "string", "format": "uri"}
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["symbol", "mint", "decimals", "token_program"],
+      "properties": {
+        "symbol": {"type": "string", "minLength": 1, "maxLength": 32},
+        "mint": {"$ref": "#/$defs/base58Address"},
+        "decimals": {"type": "integer", "minimum": 0, "maximum": 18},
+        "token_program": {"$ref": "#/$defs/base58Address"}
+      }
+    },
+    "treasury": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "token_account"],
+      "properties": {
+        "owner": {"$ref": "#/$defs/base58Address"},
+        "token_account": {"$ref": "#/$defs/base58Address"}
+      }
+    },
+    "transfer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transfer_id", "allocation_id", "contributor_id", "recipient_owner", "recipient_token_account", "amount_base_units"],
+      "properties": {
+        "transfer_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "allocation_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "contributor_id": {"type": "string", "format": "uri"},
+        "recipient_owner": {"$ref": "#/$defs/base58Address"},
+        "recipient_token_account": {"$ref": "#/$defs/base58Address"},
+        "amount_base_units": {"$ref": "common.schema.json#/$defs/nonNegativeIntegerString"}
+      }
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transfer_count", "amount_base_units"],
+      "properties": {
+        "transfer_count": {"type": "integer", "minimum": 1},
+        "amount_base_units": {"$ref": "common.schema.json#/$defs/nonNegativeIntegerString"}
+      }
+    },
+    "transactionBatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batch_id", "transfer_ids", "instruction", "memo_program", "memo"],
+      "properties": {
+        "batch_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "transfer_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 128}
+        },
+        "instruction": {"const": "TransferChecked"},
+        "memo_program": {"$ref": "#/$defs/base58Address"},
+        "memo": {"type": "string", "pattern": "^capy:payout:urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", "maxLength": 256}
+      }
+    },
+    "executionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_commitment", "preflight", "recipient_account_validation", "duplicate_prevention", "partial_batch_failure"],
+      "properties": {
+        "required_commitment": {"const": "finalized"},
+        "preflight": {"const": true},
+        "recipient_account_validation": {"const": "mint-owner-token-program-match"},
+        "duplicate_prevention": {"const": "offchain-idempotency-ledger"},
+        "partial_batch_failure": {"const": "retry-unsettled-batches-only"}
+      }
+    },
+    "settlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "transactions"],
+      "properties": {
+        "state": {"enum": ["planned", "submitted", "finalized", "failed", "cancelled"]},
+        "transactions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/settlementTransaction"}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "planned"}}, "required": ["state"]},
+          "then": {"properties": {"transactions": {"type": "array", "maxItems": 0}}}
+        },
+        {
+          "if": {"properties": {"state": {"const": "finalized"}}, "required": ["state"]},
+          "then": {"properties": {"transactions": {"type": "array", "minItems": 1}}}
+        }
+      ]
+    },
+    "settlementTransaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batch_id", "signature", "slot", "commitment", "observed_at"],
+      "properties": {
+        "batch_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "signature": {"type": "string", "pattern": "^[1-9A-HJ-NP-Za-km-z]{80,90}$"},
+        "slot": {"$ref": "common.schema.json#/$defs/nonNegativeIntegerString"},
+        "commitment": {"const": "finalized"},
+        "observed_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}

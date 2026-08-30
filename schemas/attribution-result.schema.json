@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/v1/attribution-result.schema.json",
+  "title": "capy attribution result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "protocol_version",
+    "schema_version",
+    "object_type",
+    "object_id",
+    "issued_at",
+    "payload",
+    "integrity",
+    "signatures"
+  ],
+  "properties": {
+    "$schema": {"const": "https://capy.network/schemas/v1/attribution-result.schema.json"},
+    "protocol_version": {"const": "1.0.0"},
+    "schema_version": {"const": "1.0.0"},
+    "object_type": {"const": "attribution_result"},
+    "object_id": {"type": "string", "format": "uri"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "supersedes": {"$ref": "common.schema.json#/$defs/attributionReference"},
+    "payload": {"$ref": "#/$defs/payload"},
+    "integrity": {"$ref": "common.schema.json#/$defs/integrity"},
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "common.schema.json#/$defs/signature"}
+    }
+  },
+  "$defs": {
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evaluation_receipt",
+        "attributor",
+        "computed_at",
+        "method",
+        "input_cohorts",
+        "allocations",
+        "payout_pool",
+        "conservation",
+        "reproducibility"
+      ],
+      "properties": {
+        "evaluation_receipt": {"$ref": "common.schema.json#/$defs/evaluationReference"},
+        "attributor": {"$ref": "common.schema.json#/$defs/actor"},
+        "computed_at": {"type": "string", "format": "date-time"},
+        "method": {"$ref": "#/$defs/method"},
+        "input_cohorts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "common.schema.json#/$defs/cohortReference"}
+        },
+        "allocations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/allocation"}
+        },
+        "payout_pool": {"$ref": "#/$defs/payoutPool"},
+        "conservation": {"$ref": "#/$defs/conservation"},
+        "reproducibility": {"$ref": "#/$defs/reproducibility"}
+      }
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "implementation", "score_semantics", "negative_score_policy", "randomness"],
+      "properties": {
+        "name": {"enum": ["leave_one_cohort_out", "shapley_monte_carlo", "accepted_episode_share", "contract_defined"]},
+        "version": {"$ref": "common.schema.json#/$defs/semver"},
+        "implementation": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "score_semantics": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "negative_score_policy": {"enum": ["clamp_to_zero", "retain", "exclude"]},
+        "randomness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["deterministic", "seed_commitment"],
+          "properties": {
+            "deterministic": {"type": "boolean"},
+            "seed_commitment": {"$ref": "common.schema.json#/$defs/sha256Digest"}
+          }
+        }
+      }
+    },
+    "allocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocation_id",
+        "contributor_id",
+        "cohort",
+        "roles",
+        "raw_score",
+        "weight_ppm",
+        "payout_amount_base_units",
+        "eligibility"
+      ],
+      "properties": {
+        "allocation_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "contributor_id": {"type": "string", "format": "uri"},
+        "cohort": {"$ref": "common.schema.json#/$defs/cohortReference"},
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["operator", "collector", "annotator", "hardware_provider", "environment_provider"]}
+        },
+        "raw_score": {"$ref": "common.schema.json#/$defs/decimal"},
+        "weight_ppm": {"type": "integer", "minimum": 0, "maximum": 1000000},
+        "payout_amount_base_units": {"$ref": "common.schema.json#/$defs/nonNegativeIntegerString"},
+        "eligibility": {"$ref": "#/$defs/eligibility"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["eligibility"],
+            "properties": {
+              "eligibility": {
+                "type": "object",
+                "required": ["eligible"],
+                "properties": {"eligible": {"const": false}}
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "weight_ppm": {"const": 0},
+              "payout_amount_base_units": {"const": "0"}
+            }
+          }
+        }
+      ]
+    },
+    "eligibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eligible",
+        "rights_valid",
+        "consent_valid",
+        "revocation_status",
+        "checked_at",
+        "registry_snapshot_digest",
+        "reasons"
+      ],
+      "properties": {
+        "eligible": {"type": "boolean"},
+        "rights_valid": {"type": "boolean"},
+        "consent_valid": {"type": "boolean"},
+        "revocation_status": {"enum": ["active", "partially_revoked", "revoked", "disputed"]},
+        "checked_at": {"type": "string", "format": "date-time"},
+        "registry_snapshot_digest": {"$ref": "common.schema.json#/$defs/sha256Digest"},
+        "reasons": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 512}
+        }
+      }
+    },
+    "payoutPool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset", "mint", "decimals", "amount_base_units"],
+      "properties": {
+        "asset": {"type": "string", "minLength": 1, "maxLength": 32},
+        "mint": {"type": "string", "pattern": "^[1-9A-HJ-NP-Za-km-z]{32,44}$"},
+        "decimals": {"type": "integer", "minimum": 0, "maximum": 18},
+        "amount_base_units": {"$ref": "common.schema.json#/$defs/nonNegativeIntegerString"}
+      }
+    },
+    "conservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total_weight_ppm", "allocated_base_units", "unallocated_base_units", "rounding_policy"],
+      "properties": {
+        "total_weight_ppm": {"const": 1000000},
+        "allocated_base_units": {"$ref": "common.schema.json#/$defs/nonNegativeIntegerString"},
+        "unallocated_base_units": {"$ref": "common.schema.json#/$defs/nonNegativeIntegerString"},
+        "rounding_policy": {"enum": ["largest_remainder", "treasury_remainder"]}
+      }
+    },
+    "reproducibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_snapshot", "counterfactual_results", "calculation_trace"],
+      "properties": {
+        "input_snapshot": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "counterfactual_results": {"$ref": "common.schema.json#/$defs/artifactReference"},
+        "calculation_trace": {"$ref": "common.schema.json#/$defs/artifactReference"}
+      }
+    }
+  }
+}
