@@ -1,0 +1,11 @@
+result url: https://d8j0ntlcm91z4.cloudfront.net/user_3DHsPC6OCpyUmzAQPLHPaZStjet/hf_20260830_203200_03fadfe9-f355-4895-8723-7cf19a0e6aa3.svg
+
+generation notes:
+- model: recraft_v4_1
+- model type: vector
+- requested aspect ratio: 4:3
+- requested resolution: 2k
+- source output: native 2432 x 1792 svg with transparency
+- delivered output: 2432 x 1792 rgba png
+- visual inspection: exact lowercase "capy" is highly readable; cocoa capybara engineer, mint collar, orange telemetry capsule, receipt card, robot gripper, and verified star are present in a compact sticker badge.
+- visual caveat: the hard offset shadow rendered as a muted teal-gray rather than the exact requested #224c43, and the fourth mini glyph is integrated abstractly rather than appearing as a distinct data capsule.

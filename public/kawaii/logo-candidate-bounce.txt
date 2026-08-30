@@ -1,0 +1,8 @@
+result url: https://d8j0ntlcm91z4.cloudfront.net/user_3DHsPC6OCpyUmzAQPLHPaZStjet/hf_20260830_203150_471c325e-f02b-4386-815f-bbceb9330c59.svg
+
+notes:
+- generated with higgsfield recraft_v4_1 using model_type vector, 4:3 aspect ratio, and 2k resolution.
+- higgsfield returned an svg vector master; it was rasterized to the requested png path.
+- output dimensions: 2432 x 1792 px.
+- png is rgba with transparency.
+- visual inspection passed: readable lowercase capy wordmark, capybara field engineer, tablet, robot gripper, verified star, white sticker keyline, and dark offset shadow are present.

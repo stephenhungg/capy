@@ -1,0 +1,11 @@
+source url: https://d8j0ntlcm91z4.cloudfront.net/user_3DHsPC6OCpyUmzAQPLHPaZStjet/hf_20260830_203228_50ad44c7-f885-49ab-ae50-b114117f7187.svg
+model: higgsfield recraft v4.1 (recraft_v4_1)
+settings: 4:3, 2k, vector
+local asset: logo-candidate-receipt.png
+dimensions: 2432 x 1792 rgba with transparency
+
+visual qa:
+- the lowercase capy wordmark is clear and readable with no extra words.
+- the receipt-card silhouette, capybara field engineer, robotic gripper, and verified-star stamp are all present.
+- the palette, thick white die-cut border, and hard dark-green offset shadow read cleanly at both logo and sticker scale.
+- higgsfield returned a native svg; it was downloaded and rasterized to the requested transparent png.
