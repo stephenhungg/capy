@@ -1,0 +1,512 @@
+{
+  "attribution": {
+    "bootstrap_consensus_rank_stability": 0.9516666666666667,
+    "bootstrap_replicates_per_training_seed": 2000,
+    "cohorts": {
+      "random": {
+        "marginal_gain_95": [
+          -0.012500000000000011,
+          0.23750000000000004
+        ],
+        "mean_marginal_gain": 0.112846875,
+        "probability_ranked_first": 0.04833333333333333
+      },
+      "targeted": {
+        "marginal_gain_95": [
+          0.11875000000000002,
+          0.34374999999999994
+        ],
+        "mean_marginal_gain": 0.2312625,
+        "probability_ranked_first": 0.9516666666666667
+      }
+    },
+    "consensus_order": [
+      "targeted",
+      "random"
+    ],
+    "interpretation": "cohort payout-sensitivity diagnostic; not exact per-episode causality",
+    "lineage": "recomputed from held-out real scenario blocks for every registered training seed",
+    "replicates": 6000,
+    "training_seeds": [
+      104729,
+      130363,
+      155921
+    ]
+  },
+  "baseline_selection": {
+    "base_data_hash": "sha256:base-data-v1",
+    "code_hash": "sha256:code-baseline-v1",
+    "eligible_candidate_count": 2,
+    "selected_policy_id": "baseline_bc_003",
+    "selection_rule": "highest eligible validation success; policy-id tie break",
+    "visible_validation_safety_event_rate": 0.03,
+    "visible_validation_success": 0.47
+  },
+  "collection": {
+    "allowed_cost_imbalance_fraction": 0.005,
+    "assignment_blocks": 12,
+    "cohorts": {
+      "random": {
+        "accepted_by_failure_mode": {
+          "compliance_edge": 30,
+          "high_friction": 30,
+          "lateral_offset": 30,
+          "nominal": 30
+        },
+        "accepted_episodes": 120,
+        "attempted_episodes": 132,
+        "attempts_by_failure_mode": {
+          "compliance_edge": 33,
+          "high_friction": 33,
+          "lateral_offset": 33,
+          "nominal": 33
+        },
+        "cost_usd": 1320.0,
+        "operator_minutes": 660.0,
+        "rejected_or_aborted_episodes": 12,
+        "rights_complete_fraction": 0.9916666666666667
+      },
+      "targeted": {
+        "accepted_by_failure_mode": {
+          "compliance_edge": 30,
+          "high_friction": 30,
+          "lateral_offset": 30,
+          "nominal": 30
+        },
+        "accepted_episodes": 120,
+        "attempted_episodes": 132,
+        "attempts_by_failure_mode": {
+          "compliance_edge": 33,
+          "high_friction": 33,
+          "lateral_offset": 33,
+          "nominal": 33
+        },
+        "cost_usd": 1320.0,
+        "operator_minutes": 660.0,
+        "rejected_or_aborted_episodes": 12,
+        "rights_complete_fraction": 0.9916666666666667
+      }
+    },
+    "cost_imbalance_fraction": 0.0,
+    "equal_cost_valid": true
+  },
+  "data_class": "synthetic",
+  "data_warning": "pipeline fixture only; not empirical evidence",
+  "decision_registry": [
+    {
+      "action_on_failure": "kill bounty-compiler claim; sell data/evaluation tooling only",
+      "evidence": {
+        "first_task_ratio": 2.0555555555555562,
+        "first_task_signal": "provisional_pass",
+        "reason": "criterion requires three tasks; this report contains one",
+        "tasks_completed": 1,
+        "tasks_required": 3
+      },
+      "id": "targeted_cost_efficiency",
+      "metric": "targeted_to_random_gain_per_dollar_ratio",
+      "operator": ">=",
+      "scope": "across_three_tasks",
+      "source_kind": "proposed_management_threshold",
+      "status": "not_evaluated",
+      "value": 1.25
+    },
+    {
+      "action_on_failure": "do not use simulation outcomes for settlement",
+      "evidence": {
+        "observed": 0.8214285714285714
+      },
+      "id": "sim_real_rank",
+      "metric": "spearman_sim_real_policy_rank",
+      "operator": ">=",
+      "scope": "calibrated_tasks",
+      "source_kind": "proposed_management_threshold",
+      "status": "synthetic_fixture_pass",
+      "value": 0.6
+    },
+    {
+      "action_on_failure": "pay acquisition and quality only; disable performance pool",
+      "evidence": {
+        "observed": 0.9516666666666667
+      },
+      "id": "attribution_rank_stability",
+      "metric": "bootstrap_consensus_rank_stability",
+      "operator": ">=",
+      "scope": "across_training_seeds_and_bootstrap_samples",
+      "source_kind": "proposed_management_threshold",
+      "status": "synthetic_fixture_pass",
+      "value": 0.7
+    },
+    {
+      "action_on_failure": "retain corpus only for ontology/evidence work",
+      "evidence": {
+        "reason": "metric is outside this experiment's data contract"
+      },
+      "id": "world_context_lift",
+      "metric": "tier0_world_context_downstream_lift",
+      "operator": ">",
+      "scope": "separate_ablation",
+      "source_kind": "proposed_management_threshold",
+      "status": "not_evaluated",
+      "value": 0.0
+    },
+    {
+      "action_on_failure": "do not open a public contributor network",
+      "evidence": {
+        "observed_rights_complete_fraction": 0.9916666666666667,
+        "reason": "the full criterion also requires public-network supply economics, which this experiment does not measure"
+      },
+      "id": "rights_completeness",
+      "metric": "rights_complete_episode_fraction",
+      "operator": ">=",
+      "scope": "public_network_supply",
+      "source_kind": "proposed_management_threshold",
+      "status": "not_evaluated",
+      "value": 0.95
+    },
+    {
+      "action_on_failure": "do not claim market validation",
+      "evidence": {
+        "reason": "metric is outside this experiment's data contract"
+      },
+      "id": "paid_repeat",
+      "metric": "external_team_paid_repeat_after_successful_pilot",
+      "operator": "==",
+      "scope": "post_pilot_market_test",
+      "source_kind": "proposed_management_threshold",
+      "status": "not_evaluated",
+      "value": true
+    },
+    {
+      "action_on_failure": "reject candidate regardless of success lift",
+      "evidence": {
+        "random": 0.002083333333333331,
+        "targeted": -0.0041666666666666675
+      },
+      "id": "safety_noninferiority",
+      "metric": "safety_event_risk_difference_upper_ci",
+      "operator": "<=",
+      "scope": "held_out_real_trials",
+      "source_kind": "proposed_management_threshold",
+      "status": "synthetic_fixture_pass",
+      "value": 0.02
+    },
+    {
+      "action_on_failure": "stop evaluation and reject candidate",
+      "evidence": {
+        "observed": 0
+      },
+      "id": "catastrophic_safety",
+      "metric": "catastrophic_event_count",
+      "operator": "==",
+      "scope": "held_out_real_trials",
+      "source_kind": "proposed_management_threshold",
+      "status": "synthetic_fixture_pass",
+      "value": 0
+    }
+  ],
+  "evidence_registry": [
+    {
+      "claim": "YAM is a six-degree-of-freedom manipulator with Python SDK, MuJoCo simulation, and teleoperation support.",
+      "id": "yam-interface",
+      "source_kind": "sourced_claim",
+      "source_title": "i2rt YAM documentation",
+      "source_url": "https://doc.i2rt.com/products/yam"
+    },
+    {
+      "claim": "The public i2rt interfaces expose measured joint state; the inspected simulator exposes joint and gripper position, velocity, and effort.",
+      "id": "i2rt-state",
+      "source_kind": "sourced_claim",
+      "source_title": "i2rt repository",
+      "source_url": "https://github.com/i2rt-robotics/i2rt"
+    },
+    {
+      "claim": "Simulation-based robot-policy evaluation should be validated against relative real-policy performance rather than treated as an oracle.",
+      "id": "sim-rank",
+      "source_kind": "sourced_claim",
+      "source_title": "Li et al., Evaluating Real-World Robot Manipulation Policies in Simulation",
+      "source_url": "https://arxiv.org/abs/2405.05941"
+    },
+    {
+      "claim": "Data Shapley values data through marginal utility over subsets and exact evaluation requires repeated model training.",
+      "id": "data-shapley",
+      "source_kind": "sourced_claim",
+      "source_title": "Ghorbani and Zou, Data Shapley",
+      "source_url": "https://proceedings.mlr.press/v97/ghorbani19c.html"
+    },
+    {
+      "claim": "Retraining-based data valuation can be expensive and sensitive to stochastic training.",
+      "id": "attribution-instability",
+      "source_kind": "sourced_claim",
+      "source_title": "Wang et al., Data Shapley in One Training Run",
+      "source_url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/20fdaf67581e6d7157376d1ed584040a-Paper-Conference.pdf"
+    }
+  ],
+  "first_task_signal": "provisional_pass",
+  "held_out_real": {
+    "failure_mode_strata": {
+      "compliance_edge": 40,
+      "high_friction": 40,
+      "lateral_offset": 40,
+      "nominal": 40
+    },
+    "policy_results": {
+      "baseline_bc_003": {
+        "cohort_id": "baseline",
+        "success_rate": 0.4625,
+        "success_rate_wilson_95": [
+          0.3870290480991994,
+          0.5397294165386635
+        ],
+        "successes": 74,
+        "training_seed": 0,
+        "trials": 160
+      },
+      "random_bc_104729": {
+        "cohort_id": "random",
+        "success_rate": 0.60625,
+        "success_rate_wilson_95": [
+          0.5289051905524178,
+          0.6786124929736372
+        ],
+        "successes": 97,
+        "training_seed": 104729,
+        "trials": 160
+      },
+      "random_bc_130363": {
+        "cohort_id": "random",
+        "success_rate": 0.59375,
+        "success_rate_wilson_95": [
+          0.5163168856257644,
+          0.6667869527795783
+        ],
+        "successes": 95,
+        "training_seed": 130363,
+        "trials": 160
+      },
+      "random_bc_155921": {
+        "cohort_id": "random",
+        "success_rate": 0.525,
+        "success_rate_wilson_95": [
+          0.447946607048211,
+          0.6008810831932139
+        ],
+        "successes": 84,
+        "training_seed": 155921,
+        "trials": 160
+      },
+      "targeted_bc_104729": {
+        "cohort_id": "targeted",
+        "success_rate": 0.6875,
+        "success_rate_wilson_95": [
+          0.6119941011632154,
+          0.7542135756474703
+        ],
+        "successes": 110,
+        "training_seed": 104729,
+        "trials": 160
+      },
+      "targeted_bc_130363": {
+        "cohort_id": "targeted",
+        "success_rate": 0.675,
+        "success_rate_wilson_95": [
+          0.5990613789197846,
+          0.7427324527701887
+        ],
+        "successes": 108,
+        "training_seed": 130363,
+        "trials": 160
+      },
+      "targeted_bc_155921": {
+        "cohort_id": "targeted",
+        "success_rate": 0.71875,
+        "success_rate_wilson_95": [
+          0.6445855244726805,
+          0.7826567651397861
+        ],
+        "successes": 115,
+        "training_seed": 155921,
+        "trials": 160
+      }
+    },
+    "scenario_blocks": 160
+  },
+  "limitations": [
+    "synthetic results are pipeline fixtures and cannot support a product or scientific claim",
+    "binary fixture success does not capture every trajectory-quality dimension",
+    "the normal-approximation power calculation ignores final hardware block correlation",
+    "sim-to-real rank uses seven related policies and may be dominated by between-cohort separation",
+    "cohort rank stability is not exact per-episode causal attribution"
+  ],
+  "overall_decision": "synthetic_fixture_only",
+  "power_analysis": {
+    "actual_real_trials_per_policy": 160,
+    "baseline_success": 0.45,
+    "desired_power": 0.8,
+    "meets_planned_sample_size": true,
+    "method": "normal_approximation_linear_gain_contrast_equal_cost",
+    "one_sided_alpha": 0.05,
+    "primary_estimand_alignment": "linear contrast of targeted and random baseline-relative gains at equal cost",
+    "random_success_under_alternative": 0.55,
+    "required_trials_per_policy": 127,
+    "source_kind": "design_choice",
+    "targeted_success_under_alternative": 0.75,
+    "targeted_to_random_gain_ratio_null": 1.25,
+    "warning": "planning approximation assumes independent binomial proportions; update with hardware pilot block correlation"
+  },
+  "primary_endpoint": {
+    "baseline_success_rate": 0.4625,
+    "bootstrap_replicates_requested": 2000,
+    "bootstrap_unit": "failure-mode-stratified held-out scenario block",
+    "gain_per_dollar_threshold_contrast": 6.865530303030305e-05,
+    "gain_per_dollar_threshold_contrast_95": [
+      1.6177398989898986e-05,
+      0.00012389520202020195
+    ],
+    "probability_threshold_contrast_positive": 0.9945,
+    "random_absolute_gain": 0.11249999999999993,
+    "random_gain_95": [
+      0.016666666666666607,
+      0.20208333333333334
+    ],
+    "random_gain_nonpositive_bootstrap_fraction": 0.009,
+    "random_gain_per_dollar": 8.522727272727268e-05,
+    "ratio_95": null,
+    "ratio_interval_reason": "not reported: ratios are singular when bootstrap random gain approaches or crosses zero",
+    "targeted_absolute_gain": 0.23124999999999996,
+    "targeted_gain_95": [
+      0.1416666666666666,
+      0.31875
+    ],
+    "targeted_gain_per_dollar": 0.0001751893939393939,
+    "targeted_to_random_gain_per_dollar_ratio": 2.0555555555555562
+  },
+  "protocol_id": "capy-yam-fixed-insertion-v1",
+  "provenance": {
+    "capture_contract": {
+      "calibration_hash": "sha256:a0cfc0bd040d0743c2a934a845fcfc242324502ce09e344873a42592d942312a",
+      "controller_hash": "sha256:487eb74f2985af055cbf956cd823eecce039cd8888e22dbe07f1f8edc641d232",
+      "data_origin": "synthetic",
+      "fixture_geometry_hash": "sha256:5817081d24223b1c6ca96abbcd5676ba390313c08ee6d8f73af298f2363f64f4",
+      "protocol_id": "capy-yam-fixed-insertion-v1",
+      "reset_procedure_hash": "sha256:a9cc7d28f2a732aa8c7b849b8c34f44ed0dcaadf3389e05eeece23a0cb58573d",
+      "schema_version": 1,
+      "sensor_manifest": {
+        "camera_stream_count": 0,
+        "commanded_action_stream": true,
+        "measured_signals": [
+          "joint_pos",
+          "joint_vel",
+          "joint_eff",
+          "gripper_pos",
+          "gripper_vel",
+          "gripper_eff"
+        ]
+      },
+      "task_id": "yam-keyed-peg-fixed-fixture-v1"
+    },
+    "config_sha256": "50186e55d184712cb7408d0394d73935801c72359dcb4a98e8ae44e333c90715",
+    "input_file_sha256": {
+      "SYNTHETIC_FIXTURE_DO_NOT_USE_AS_OBSERVED": "77bfa73a41852111cfb63d5621f827bf19994524bc156b102b6255a4af5ce2e3",
+      "baseline_candidates.csv": "0299eb169296e876b9bc7466a4bce61698623e23ef4ac7918f801ae22038f091",
+      "capture_manifest.json": "b4ad77ee125b92254fb2e99fa9863ccad014de3c0bcf134dc5fccc458e31f331",
+      "collection_episodes.csv": "cf39a445a96c3931c9e42ec211794b218b09a7b1785f231d147b59adec4de700",
+      "evaluation_trials.csv": "947b702a26200c645a390253eee6470d12b64803cf51463339ea2908fecd739b"
+    },
+    "metadata_sha256": "050cde36f86e66fd274a62c0ddd6357dac84302d040c976e229019b549b7a9eb",
+    "source_kinds": {
+      "design_choice": "frozen experiment choice; not asserted as universally optimal",
+      "proposed_management_threshold": "capy decision rule; not a research fact",
+      "sourced_claim": "narrow statement backed by a primary or official source"
+    }
+  },
+  "safety": {
+    "random": {
+      "catastrophic_event_count": 0,
+      "component_event_rates": {
+        "contact_force_proxy_breach": {
+          "baseline": 0.00625,
+          "candidate": 0.0020833333333333333
+        },
+        "limit_violation": {
+          "baseline": 0.01875,
+          "candidate": 0.00625
+        },
+        "protective_stop": {
+          "baseline": 0.00625,
+          "candidate": 0.0
+        }
+      },
+      "noninferiority_margin": 0.02,
+      "passes_guardrail": true,
+      "risk_difference_95": [
+        -0.05416666666666667,
+        0.002083333333333331
+      ],
+      "risk_difference_vs_baseline": -0.02291666666666667
+    },
+    "targeted": {
+      "catastrophic_event_count": 0,
+      "component_event_rates": {
+        "contact_force_proxy_breach": {
+          "baseline": 0.00625,
+          "candidate": 0.0020833333333333333
+        },
+        "limit_violation": {
+          "baseline": 0.01875,
+          "candidate": 0.0020833333333333333
+        },
+        "protective_stop": {
+          "baseline": 0.00625,
+          "candidate": 0.0
+        }
+      },
+      "noninferiority_margin": 0.02,
+      "passes_guardrail": true,
+      "risk_difference_95": [
+        -0.05625,
+        -0.0041666666666666675
+      ],
+      "risk_difference_vs_baseline": -0.027083333333333334
+    }
+  },
+  "schema_version": 1,
+  "simulation_to_real": {
+    "bootstrap_replicates_valid": 2000,
+    "bootstrap_unit": "failure-mode-stratified full scenario blocks within each domain",
+    "policy_count": 7,
+    "policy_ids": [
+      "baseline_bc_003",
+      "random_bc_104729",
+      "random_bc_130363",
+      "random_bc_155921",
+      "targeted_bc_104729",
+      "targeted_bc_130363",
+      "targeted_bc_155921"
+    ],
+    "real_success_rates": {
+      "baseline_bc_003": 0.4625,
+      "random_bc_104729": 0.60625,
+      "random_bc_130363": 0.59375,
+      "random_bc_155921": 0.525,
+      "targeted_bc_104729": 0.6875,
+      "targeted_bc_130363": 0.675,
+      "targeted_bc_155921": 0.71875
+    },
+    "simulation_success_rates": {
+      "baseline_bc_003": 0.48125,
+      "random_bc_104729": 0.590625,
+      "random_bc_130363": 0.59375,
+      "random_bc_155921": 0.609375,
+      "targeted_bc_104729": 0.815625,
+      "targeted_bc_130363": 0.7375,
+      "targeted_bc_155921": 0.771875
+    },
+    "spearman_policy_rank": 0.8214285714285714,
+    "spearman_policy_rank_95": [
+      0.5585812268712466,
+      0.9642857142857143
+    ],
+    "warning": "only seven related policies; between-cohort separation may dominate rank correlation"
+  },
+  "task_id": "yam-keyed-peg-fixed-fixture-v1"
+}

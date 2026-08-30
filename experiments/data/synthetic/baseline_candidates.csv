@@ -1,0 +1,4 @@
+policy_id,policy_family,validation_success,safety_event_rate,catastrophic_events,compute_complete,schema_match,eligible_for_selection,code_hash,base_data_hash
+baseline_bc_001,proprioceptive-behavioral-cloning-v1,0.42,0.020,0,1,1,1,sha256:code-baseline-v1,sha256:base-data-v1
+baseline_bc_002,proprioceptive-behavioral-cloning-v1,0.51,0.090,0,1,1,0,sha256:code-baseline-v1,sha256:base-data-v1
+baseline_bc_003,proprioceptive-behavioral-cloning-v1,0.47,0.030,0,1,1,1,sha256:code-baseline-v1,sha256:base-data-v1

@@ -1,0 +1,22 @@
+{
+  "calibration_hash": "sha256:a0cfc0bd040d0743c2a934a845fcfc242324502ce09e344873a42592d942312a",
+  "controller_hash": "sha256:487eb74f2985af055cbf956cd823eecce039cd8888e22dbe07f1f8edc641d232",
+  "data_origin": "synthetic",
+  "fixture_geometry_hash": "sha256:5817081d24223b1c6ca96abbcd5676ba390313c08ee6d8f73af298f2363f64f4",
+  "protocol_id": "capy-yam-fixed-insertion-v1",
+  "reset_procedure_hash": "sha256:a9cc7d28f2a732aa8c7b849b8c34f44ed0dcaadf3389e05eeece23a0cb58573d",
+  "schema_version": 1,
+  "sensor_manifest": {
+    "camera_stream_count": 0,
+    "commanded_action_stream": true,
+    "measured_signals": [
+      "joint_pos",
+      "joint_vel",
+      "joint_eff",
+      "gripper_pos",
+      "gripper_vel",
+      "gripper_eff"
+    ]
+  },
+  "task_id": "yam-keyed-peg-fixed-fixture-v1"
+}

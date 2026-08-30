@@ -1,0 +1,28 @@
+{
+  "data_class": "synthetic",
+  "files": {
+    "SYNTHETIC_FIXTURE_DO_NOT_USE_AS_OBSERVED": "77bfa73a41852111cfb63d5621f827bf19994524bc156b102b6255a4af5ce2e3",
+    "baseline_candidates.csv": "0299eb169296e876b9bc7466a4bce61698623e23ef4ac7918f801ae22038f091",
+    "capture_manifest.json": "b4ad77ee125b92254fb2e99fa9863ccad014de3c0bcf134dc5fccc458e31f331",
+    "collection_episodes.csv": "cf39a445a96c3931c9e42ec211794b218b09a7b1785f231d147b59adec4de700",
+    "evaluation_trials.csv": "947b702a26200c645a390253eee6470d12b64803cf51463339ea2908fecd739b"
+  },
+  "generator_version": "0.1.0",
+  "protocol_id": "capy-yam-fixed-insertion-v1",
+  "schema_version": 1,
+  "seeds": {
+    "algorithm": "sha256-seeded-python-mt-v1",
+    "bootstrap_seed": 314159,
+    "collection_seed": 424242,
+    "evaluation_seed": 515151,
+    "failure_modes": [
+      "nominal",
+      "lateral_offset",
+      "high_friction",
+      "compliance_edge"
+    ],
+    "synthetic_seed": 8675309
+  },
+  "task_id": "yam-keyed-peg-fixed-fixture-v1",
+  "warning": "pipeline fixture only; not empirical evidence"
+}

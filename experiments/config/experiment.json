@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "protocol_id": "capy-yam-fixed-insertion-v1",
+  "task_id": "yam-keyed-peg-fixed-fixture-v1",
+  "example_data_class": "synthetic",
+  "policy": {
+    "family": "proprioceptive-behavioral-cloning-v1",
+    "baseline_policy_id": "baseline_bc_003",
+    "visible_validation_safety_ceiling": 0.05,
+    "training_seeds": [104729, 130363, 155921]
+  },
+  "randomization": {
+    "collection_seed": 424242,
+    "evaluation_seed": 515151,
+    "synthetic_seed": 8675309,
+    "bootstrap_seed": 314159,
+    "algorithm": "sha256-seeded-python-mt-v1",
+    "failure_modes": ["nominal", "lateral_offset", "high_friction", "compliance_edge"]
+  },
+  "collection": {
+    "cohorts": ["random", "targeted"],
+    "accepted_episodes_per_cohort": 120,
+    "attempts_per_cohort": 132,
+    "loaded_rate_per_minute": 2.0,
+    "minutes_per_episode": 5.0,
+    "allowed_cost_imbalance_fraction": 0.005
+  },
+  "power": {
+    "method": "normal_approximation_linear_gain_contrast_equal_cost",
+    "baseline_success": 0.45,
+    "random_success_under_alternative": 0.55,
+    "targeted_success_under_alternative": 0.75,
+    "targeted_to_random_gain_ratio_null": 1.25,
+    "one_sided_alpha": 0.05,
+    "desired_power": 0.80,
+    "source_kind": "design_choice"
+  },
+  "evaluation": {
+    "real_trials_per_policy": 160,
+    "sim_trials_per_policy": 320,
+    "bootstrap_replicates": 2000,
+    "allowed_infrastructure_exclusion_reasons": [
+      "pre_control_communication_fault",
+      "pre_control_fixture_fault",
+      "pre_control_safety_check_failure"
+    ]
+  },
+  "claims": [
+    {
+      "id": "yam-interface",
+      "claim": "YAM is a six-degree-of-freedom manipulator with Python SDK, MuJoCo simulation, and teleoperation support.",
+      "source_kind": "sourced_claim",
+      "source_title": "i2rt YAM documentation",
+      "source_url": "https://doc.i2rt.com/products/yam"
+    },
+    {
+      "id": "i2rt-state",
+      "claim": "The public i2rt interfaces expose measured joint state; the inspected simulator exposes joint and gripper position, velocity, and effort.",
+      "source_kind": "sourced_claim",
+      "source_title": "i2rt repository",
+      "source_url": "https://github.com/i2rt-robotics/i2rt"
+    },
+    {
+      "id": "sim-rank",
+      "claim": "Simulation-based robot-policy evaluation should be validated against relative real-policy performance rather than treated as an oracle.",
+      "source_kind": "sourced_claim",
+      "source_title": "Li et al., Evaluating Real-World Robot Manipulation Policies in Simulation",
+      "source_url": "https://arxiv.org/abs/2405.05941"
+    },
+    {
+      "id": "data-shapley",
+      "claim": "Data Shapley values data through marginal utility over subsets and exact evaluation requires repeated model training.",
+      "source_kind": "sourced_claim",
+      "source_title": "Ghorbani and Zou, Data Shapley",
+      "source_url": "https://proceedings.mlr.press/v97/ghorbani19c.html"
+    },
+    {
+      "id": "attribution-instability",
+      "claim": "Retraining-based data valuation can be expensive and sensitive to stochastic training.",
+      "source_kind": "sourced_claim",
+      "source_title": "Wang et al., Data Shapley in One Training Run",
+      "source_url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/20fdaf67581e6d7157376d1ed584040a-Paper-Conference.pdf"
+    }
+  ],
+  "thresholds": [
+    {
+      "id": "targeted_cost_efficiency",
+      "metric": "targeted_to_random_gain_per_dollar_ratio",
+      "operator": ">=",
+      "value": 1.25,
+      "scope": "across_three_tasks",
+      "source_kind": "proposed_management_threshold",
+      "action_on_failure": "kill bounty-compiler claim; sell data/evaluation tooling only"
+    },
+    {
+      "id": "sim_real_rank",
+      "metric": "spearman_sim_real_policy_rank",
+      "operator": ">=",
+      "value": 0.60,
+      "scope": "calibrated_tasks",
+      "source_kind": "proposed_management_threshold",
+      "action_on_failure": "do not use simulation outcomes for settlement"
+    },
+    {
+      "id": "attribution_rank_stability",
+      "metric": "bootstrap_consensus_rank_stability",
+      "operator": ">=",
+      "value": 0.70,
+      "scope": "across_training_seeds_and_bootstrap_samples",
+      "source_kind": "proposed_management_threshold",
+      "action_on_failure": "pay acquisition and quality only; disable performance pool"
+    },
+    {
+      "id": "world_context_lift",
+      "metric": "tier0_world_context_downstream_lift",
+      "operator": ">",
+      "value": 0.0,
+      "scope": "separate_ablation",
+      "source_kind": "proposed_management_threshold",
+      "action_on_failure": "retain corpus only for ontology/evidence work"
+    },
+    {
+      "id": "rights_completeness",
+      "metric": "rights_complete_episode_fraction",
+      "operator": ">=",
+      "value": 0.95,
+      "scope": "public_network_supply",
+      "source_kind": "proposed_management_threshold",
+      "action_on_failure": "do not open a public contributor network"
+    },
+    {
+      "id": "paid_repeat",
+      "metric": "external_team_paid_repeat_after_successful_pilot",
+      "operator": "==",
+      "value": true,
+      "scope": "post_pilot_market_test",
+      "source_kind": "proposed_management_threshold",
+      "action_on_failure": "do not claim market validation"
+    },
+    {
+      "id": "safety_noninferiority",
+      "metric": "safety_event_risk_difference_upper_ci",
+      "operator": "<=",
+      "value": 0.02,
+      "scope": "held_out_real_trials",
+      "source_kind": "proposed_management_threshold",
+      "action_on_failure": "reject candidate regardless of success lift"
+    },
+    {
+      "id": "catastrophic_safety",
+      "metric": "catastrophic_event_count",
+      "operator": "==",
+      "value": 0,
+      "scope": "held_out_real_trials",
+      "source_kind": "proposed_management_threshold",
+      "action_on_failure": "stop evaluation and reject candidate"
+    }
+  ]
+}
