@@ -1,0 +1,38 @@
+{
+  "release": "WORLD_CONTEXT_HACKATHON_V3_PUBLIC@3.1.1",
+  "clip_id": "clip_panel_fitting_example",
+  "task_label": "panel-fitting-placement",
+  "normalized_task_id": "place_panel_in_fixture@1",
+  "metadata_uri": "world-context://WORLD_CONTEXT_HACKATHON_V3_PUBLIC@3.1.1/clips/clip_panel_fitting_example",
+  "workflow_prior": {
+    "provenance": "derived",
+    "intent": "place the selected panel flush inside the marked fixture",
+    "task_graph": [
+      "detect_panel",
+      "approach",
+      "grasp",
+      "transport",
+      "align",
+      "insert",
+      "release"
+    ],
+    "phases": [
+      {"phase": "setup", "candidate_steps": ["detect_panel"]},
+      {"phase": "approach", "candidate_steps": ["approach"]},
+      {"phase": "engage", "candidate_steps": ["grasp"]},
+      {"phase": "execute", "candidate_steps": ["transport", "align", "insert", "release"]},
+      {"phase": "inspect", "candidate_steps": ["check_panel_flush"]}
+    ],
+    "objects": [
+      {"role": "workpiece", "type": "panel"},
+      {"role": "fixture", "type": "panel_fixture"},
+      {"role": "manipulator", "type": "human_hand_or_robot_gripper"}
+    ],
+    "initial_predicates": ["panel_on_table", "fixture_empty"],
+    "success_predicates": ["panel_inside_fixture", "panel_flush", "no_collision"],
+    "notes": [
+      "the task label is a release fact; phases, objects, and predicates are capy priors",
+      "this does not provide robot actions or establish correct procedure"
+    ]
+  }
+}

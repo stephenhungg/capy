@@ -1,0 +1,30 @@
+{
+  "capy_source": {
+    "source_record_id": "video_source_demo_001",
+    "video_uri": "file:///evidence/video01.mp4",
+    "video_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "vima_artifact": {
+    "uri": "file:///evidence/episodic_memory.json",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "episode": {
+    "episode_id": "episode_001",
+    "event_type": "masonry_work_candidate",
+    "time_start_s": 0.0,
+    "time_end_s": 10.0,
+    "evidence_frames": [
+      {"frame": "frame_000001.jpg", "votes": 1},
+      {"frame": "frame_000002.jpg", "votes": 1}
+    ],
+    "involved_tracks": ["concrete_block_wall_01", "worker_01"],
+    "labels": ["concrete block wall", "worker"],
+    "relations": ["worker_01_near_concrete_block_wall_01"],
+    "confidence": 0.875,
+    "observation": "Worker and concrete block wall are co-present, with proximity evidence where available.",
+    "spatial_facts": [
+      "concrete_block_wall_01 is in the near relative-depth band",
+      "worker_01 is in the mid relative-depth band"
+    ]
+  }
+}

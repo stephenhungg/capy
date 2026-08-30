@@ -1,0 +1,16 @@
+[project]
+name = "capy-evidence-bridge"
+version = "0.1.0"
+description = "Conservative evidence normalization for World Context, VIMA, and camera-free i2rt telemetry"
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

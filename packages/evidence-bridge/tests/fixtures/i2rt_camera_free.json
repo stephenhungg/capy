@@ -1,0 +1,51 @@
+{
+  "run_id": "i2rt_run_001",
+  "task_id": "place_panel_in_fixture@1",
+  "camera_present": false,
+  "clock": "monotonic_relative",
+  "phase": "execute",
+  "telemetry_uri": "mcap:///runs/i2rt_run_001/robot.mcap",
+  "telemetry_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "annotation_uri": "file:///runs/i2rt_run_001/manual-labels.json",
+  "annotation_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "controller_mode": "joint_position",
+  "trajectory_error_unit": "rad",
+  "trajectory_reference_frame": "joint",
+  "motor_current_baseline_a": {"joint_4": 1.2},
+  "samples": [
+    {"timestamp_s": 0.0, "motor_current_a": {"joint_4": 1.1}, "trajectory_error": {"joint_4": 0.01}, "fixture_state": {"panel_nest": "empty"}},
+    {"timestamp_s": 0.1, "motor_current_a": {"joint_4": 1.3}, "trajectory_error": {"joint_4": 0.02}, "fixture_state": {"panel_nest": "empty"}},
+    {"timestamp_s": 0.2, "motor_current_a": {"joint_4": 3.4}, "trajectory_error": {"joint_4": 0.03}, "fixture_state": {"panel_nest": "empty"}},
+    {"timestamp_s": 0.3, "motor_current_a": {"joint_4": 3.8}, "trajectory_error": {"joint_4": 0.14}, "fixture_state": {"panel_nest": "empty"}},
+    {"timestamp_s": 0.4, "motor_current_a": {"joint_4": 4.1}, "trajectory_error": {"joint_4": 0.18}, "fixture_state": {"panel_nest": "unseated"}},
+    {"timestamp_s": 0.5, "motor_current_a": {"joint_4": 3.6}, "trajectory_error": {"joint_4": 0.16}, "fixture_state": {"panel_nest": "unseated"}},
+    {"timestamp_s": 0.6, "motor_current_a": {"joint_4": 1.4}, "trajectory_error": {"joint_4": 0.12}, "fixture_state": {"panel_nest": "unseated"}},
+    {"timestamp_s": 0.7, "motor_current_a": {"joint_4": 1.2}, "trajectory_error": {"joint_4": 0.02}, "fixture_state": {"panel_nest": "unseated"}}
+  ],
+  "fixture_expectations": [
+    {
+      "fixture_id": "panel_nest",
+      "expected_state": "seated",
+      "start_s": 0.4,
+      "deadline_s": 0.6,
+      "max_observation_age_s": 0.11,
+      "phase": "inspect",
+      "sensing_method": "fixed_limit_switch_pair",
+      "state_machine_version": "panel_nest.v1"
+    }
+  ],
+  "manual_labels": [
+    {
+      "label_id": "label_001",
+      "taxonomy_label": "panel_misalignment",
+      "annotator_role": "operator",
+      "annotator_id": "operator_pseudonym_7",
+      "start_s": 0.25,
+      "end_s": 0.55,
+      "phase": "execute",
+      "confidence": 0.8,
+      "review_state": "unreviewed",
+      "notes": "felt resistance during insertion"
+    }
+  ]
+}
