@@ -12,6 +12,7 @@ failure → contract → experience → evaluation → attribution → payout
 ## what works
 
 - an authenticated, role-separated web platform for buyers, contributors, evaluators, and operators;
+- a same-origin Vercel dashboard that reports the live camera-free Railway ingest without exposing ingest credentials;
 - durable D1 workflow state, memberships, invitations, idempotent commands, audit events, and executor handoffs;
 - immutable protocol objects in R2 with storage-byte and RFC 8785 object-digest verification;
 - a direct, camera-free i2rt recorder contract using synchronized JSON MCAP channels;
@@ -39,7 +40,8 @@ the cloud never commands the robot. the public chain never receives contributor 
 ## live services
 
 - landing: [capy.stephenhung.me](https://capy.stephenhung.me)
-- authenticated dashboard: [capy-network.stephenhung.chatgpt.site](https://capy-network.stephenhung.chatgpt.site)
+- live dashboard: [capy.stephenhung.me/dashboard](https://capy.stephenhung.me/dashboard)
+- authenticated legacy control plane: [capy-network.stephenhung.chatgpt.site](https://capy-network.stephenhung.chatgpt.site)
 - camera-free ingress health: [capy-i2rt-production.up.railway.app/health](https://capy-i2rt-production.up.railway.app/health)
 
 ## protocol spine
@@ -56,6 +58,7 @@ the canonical schemas and linked example objects live in [`schemas/`](./schemas)
 
 ## repo map
 
+- `app/dashboard` — Vercel-native minimal operator surface backed by the Railway public aggregate
 - `apps/web` — authenticated Sites application, D1 schema, R2 object store, workflow, receipts, and operations UI
 - `services/i2rt-ingest` — Railway Postgres + object-storage boundary for authenticated, integrity-verified camera-free sessions
 - `packages/i2rt-recorder` — camera-free i2rt journal and MCAP export
@@ -66,7 +69,16 @@ the canonical schemas and linked example objects live in [`schemas/`](./schemas)
 - `docs/architecture` — edge/control/executor boundaries and service contracts
 - `docs/governance` — rights, privacy, provenance, disputes, and treasury policy
 
-## run the web app
+## run the web surfaces
+
+the canonical landing and live dashboard are one Next.js deployment:
+
+```bash
+npm install
+npm run dev
+```
+
+the authenticated control-plane workspace still runs separately while its D1, R2, and identity adapters are migrated:
 
 ```bash
 cd apps/web
@@ -75,7 +87,7 @@ npm run db:migrate:local
 npm run dev
 ```
 
-the local Sites identity is provided by the development runtime. start at `http://localhost:3000` and sign in through the supplied local flow.
+the local Sites identity is provided by the development runtime. sign in through the supplied local flow.
 
 ## verify the repository
 
