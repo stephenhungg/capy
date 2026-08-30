@@ -38,7 +38,7 @@ the cloud never commands the robot. the public chain never receives contributor 
 
 ## live services
 
-- landing: [capy-network.vercel.app](https://capy-network.vercel.app)
+- landing: [capy.stephenhung.me](https://capy.stephenhung.me)
 - authenticated dashboard: [capy-network.stephenhung.chatgpt.site](https://capy-network.stephenhung.chatgpt.site)
 - camera-free ingress health: [capy-i2rt-production.up.railway.app/health](https://capy-i2rt-production.up.railway.app/health)
 

@@ -40,7 +40,7 @@ the fixed-geometry YAM experiment is the first production workflow inside capy, 
 - d1 rows are tenant-scoped and r2 bytes are checked against both storage and canonical object digests.
 - first-user bootstrap is limited to a single organization owner; later members require an explicit email invitation.
 - the dashboard is intentionally minimal; full protocol objects, gates, and audit history live in the signed-record drill-down.
-- the public landing is live on Vercel and `/dashboard` hands off to the existing owner-only Sites deployment.
+- the public landing is live at `capy.stephenhung.me` on Vercel and `/dashboard` hands off to the existing owner-only Sites deployment.
 - the Railway ingress accepts only explicit zero-camera manifests, uses conditional direct uploads, and marks a session complete only after streaming byte-length and sha-256 verification.
 - a validated hardware-free i2rt journal plus deterministic MCAP completed the live Railway registration, retry, upload, finalization, and aggregate-status path.
 - remaining product work is real job creation, submission ingestion, live hidden trials, hardware sessions, funded treasury operation, and a connected Solana executor.
