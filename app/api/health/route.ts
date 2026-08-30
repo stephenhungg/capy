@@ -4,10 +4,11 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const ingress = await probeI2rtIngest();
+  const ready = ingress.state === "ready";
 
   return Response.json(
     {
-      ok: true,
+      ok: ready,
       service: "capy-web",
       deployment: "vercel",
       cameraStreams: 0,
@@ -28,6 +29,9 @@ export async function GET() {
         state: "planned",
       },
     },
-    { headers: { "cache-control": "no-store" } },
+    {
+      status: ready ? 200 : 503,
+      headers: { "cache-control": "no-store" },
+    },
   );
 }

@@ -58,7 +58,7 @@ the canonical schemas and linked example objects live in [`schemas/`](./schemas)
 
 ## repo map
 
-- `app/dashboard` — Vercel-native minimal operator surface backed by the Railway public aggregate
+- `app/dashboard` — Vercel-native minimal network surface backed by the Railway public aggregate
 - `apps/web` — authenticated Sites application, D1 schema, R2 object store, workflow, receipts, and operations UI
 - `services/i2rt-ingest` — Railway Postgres + object-storage boundary for authenticated, integrity-verified camera-free sessions
 - `packages/i2rt-recorder` — camera-free i2rt journal and MCAP export

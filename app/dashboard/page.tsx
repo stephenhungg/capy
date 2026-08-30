@@ -38,7 +38,7 @@ export default async function Dashboard() {
         </header>
 
         <section className={styles.intro}>
-          <p className={styles.eyebrow}>operator · fixed insertion v1</p>
+          <p className={styles.eyebrow}>network status · fixed insertion v1</p>
           <h1>{isLive ? "the ingest loop is live." : "the edge needs attention."}</h1>
           <p>
             one camera-free path from i2rt evidence to verified capability and a gated Solana payout.
