@@ -1,0 +1,22 @@
+{
+  "schema": "capy.payout-manifest.v1",
+  "manifest_id": "pm_2832a9497854345d",
+  "created_at": "2026-08-30T21:00:00.000Z",
+  "network": "devnet",
+  "currency": "USDC",
+  "mint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+  "decimals": 6,
+  "expected_total_usdc": "13.250000",
+  "payouts": [
+    {
+      "payout_id": "pay_7f30a10cdeadbeef",
+      "recipient_wallet": "EHNQQKabkfjzh7PsUqvJP1z117u4qKCDAEVJfMB83CwT",
+      "amount_usdc": "8.000000"
+    },
+    {
+      "payout_id": "pay_c16bd289deadbeef",
+      "recipient_wallet": "4h28746MyCqKBUYNjAbpCibWjRoMLpWs25eFfzsC6mNQ",
+      "amount_usdc": "5.250000"
+    }
+  ]
+}

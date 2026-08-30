@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.invalid/schemas/payout-manifest.v1.json",
+  "title": "capy native USDC payout manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "manifest_id",
+    "created_at",
+    "network",
+    "currency",
+    "mint",
+    "decimals",
+    "expected_total_usdc",
+    "payouts"
+  ],
+  "properties": {
+    "schema": { "const": "capy.payout-manifest.v1" },
+    "manifest_id": { "$ref": "#/$defs/opaqueManifestId" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "network": { "enum": ["devnet", "mainnet-beta"] },
+    "currency": { "const": "USDC" },
+    "mint": { "type": "string", "minLength": 32, "maxLength": 44 },
+    "decimals": { "const": 6 },
+    "expected_total_usdc": { "$ref": "#/$defs/usdcAmount" },
+    "payouts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["payout_id", "recipient_wallet", "amount_usdc"],
+        "properties": {
+          "payout_id": { "$ref": "#/$defs/opaquePayoutId" },
+          "recipient_wallet": { "type": "string", "minLength": 32, "maxLength": 44 },
+          "amount_usdc": { "$ref": "#/$defs/usdcAmount" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "opaqueManifestId": {
+      "type": "string",
+      "minLength": 19,
+      "maxLength": 64,
+      "pattern": "^pm_[a-f0-9]{16,61}$"
+    },
+    "opaquePayoutId": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 64,
+      "pattern": "^pay_[a-f0-9]{16,60}$"
+    },
+    "usdcAmount": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.[0-9]{6}$"
+    }
+  }
+}
