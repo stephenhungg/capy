@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/dispute.schema.json",
+  "title": "capy dispute and appeal record",
+  "type": "object",
+  "required": ["meta", "disputeId", "complainantRef", "type", "subjectRefs", "receivedAt", "acknowledgementDueAt", "riskDecisionDueAt", "outcomeDueAt", "state", "urgency", "interimSafeguards", "reviewerRef", "reviewerConflictRef", "nonRetaliation", "jurisdictions"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "disputeId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "complainantRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "type": { "enum": ["consent", "attribution", "facility", "license", "privacy", "safety", "evaluation", "contribution", "payout", "other"] },
+    "subjectRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "receivedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "acknowledgementDueAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "riskDecisionDueAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "outcomeDueAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "state": { "enum": ["received", "acknowledged", "triaged", "under_review", "remedy_in_progress", "decided", "appealed", "closed"] },
+    "urgency": { "enum": ["routine", "elevated", "urgent", "emergency"] },
+    "claimEvidenceRefs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/evidenceRef" } },
+    "interimSafeguards": { "type": "array", "items": { "enum": ["none", "suspend_use", "remove_content", "restrict_model", "hold_disputed_payment_only", "preserve_evidence", "stop_collection"] }, "uniqueItems": true },
+    "reviewerRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "reviewerConflictRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "nonRetaliation": { "const": true },
+    "outcome": {
+      "type": "object",
+      "required": ["decision", "rationale", "evidenceRefs", "decidedAt", "decidedBy", "appealAvailable"],
+      "properties": {
+        "decision": { "enum": ["upheld", "partially_upheld", "denied", "withdrawn", "unable_to_determine"] },
+        "rationale": { "type": "string", "minLength": 20, "maxLength": 8000 },
+        "evidenceRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/evidenceRef" } },
+        "decidedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "decidedBy": { "$ref": "common.schema.json#/$defs/actorRef" },
+        "appealAvailable": { "type": "boolean" },
+        "appealDueAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+      },
+      "additionalProperties": false
+    },
+    "remedies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action", "owner", "dueAt", "status"],
+        "properties": {
+          "action": { "type": "string", "minLength": 3, "maxLength": 1000 },
+          "owner": { "$ref": "common.schema.json#/$defs/actorRef" },
+          "dueAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "status": { "enum": ["planned", "in_progress", "completed", "failed"] },
+          "evidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "appeal": {
+      "type": "object",
+      "required": ["filedAt", "reviewerRef", "independent", "decision", "decidedAt", "rationale"],
+      "properties": {
+        "filedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "reviewerRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "independent": { "const": true },
+        "decision": { "enum": ["affirmed", "modified", "reversed"] },
+        "decidedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "rationale": { "type": "string", "minLength": 20, "maxLength": 8000 }
+      },
+      "additionalProperties": false
+    },
+    "jurisdictions": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/jurisdiction" } },
+    "closedAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+  },
+  "allOf": [
+    { "if": { "properties": { "state": { "enum": ["decided", "appealed", "closed"] } }, "required": ["state"] }, "then": { "required": ["outcome"] } },
+    { "if": { "properties": { "state": { "const": "appealed" } }, "required": ["state"] }, "then": { "required": ["appeal"] } },
+    {
+      "if": { "properties": { "state": { "const": "closed" } }, "required": ["state"] },
+      "then": {
+        "required": ["closedAt"],
+        "properties": {
+          "remedies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": { "status": { "const": "completed" } },
+              "required": ["status", "evidence"]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

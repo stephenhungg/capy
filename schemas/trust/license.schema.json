@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/license.schema.json",
+  "title": "capy asset license and rights authority record",
+  "type": "object",
+  "required": ["meta", "licenseRecordId", "subjectRefs", "status", "rightsHolderRef", "authority", "rightsCategories", "grantedActions", "commercialUse", "sublicensing", "validFrom", "territories", "recipientClasses", "reservations", "jurisdictions", "counselStatus"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "licenseRecordId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "subjectRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "status": { "enum": ["draft", "active", "suspended", "terminated", "expired", "superseded", "unknown"] },
+    "rightsHolderRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "authority": {
+      "type": "object",
+      "required": ["basis", "verified"],
+      "properties": {
+        "basis": { "enum": ["owner", "exclusive_licensee", "nonexclusive_licensee_with_sublicense", "assignee", "authorized_agent", "public_domain", "statutory_exception", "unknown"] },
+        "verified": { "type": "boolean" },
+        "evidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+      },
+      "additionalProperties": false
+    },
+    "rightsCategories": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["copyright", "database_right", "contract", "trade_secret", "publicity_likeness", "voice", "moral_right", "property", "other"] } },
+    "spdxExpression": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "spdxLicenseListVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$" },
+    "customTermsUri": { "type": "string", "format": "uri" },
+    "customTermsDigest": { "$ref": "common.schema.json#/$defs/digest" },
+    "exceptionAnalysisRef": { "$ref": "common.schema.json#/$defs/evidenceRef" },
+    "grantedActions": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["copy", "collect", "redact", "normalize", "derive", "train", "fine_tune", "evaluate", "distribute_dataset", "distribute_model", "publish_media", "commercialize"] } },
+    "commercialUse": { "type": "boolean" },
+    "sublicensing": { "enum": ["prohibited", "named_recipients_only", "permitted"] },
+    "validFrom": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "validUntil": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "territories": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^([A-Z]{2}|worldwide)$" }, "uniqueItems": true },
+    "recipientClasses": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["capy_internal", "named_processor", "named_customer", "research_partner", "general_public"] } },
+    "namedRecipientRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "reservations": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "common.schema.json#/$defs/restriction" },
+          { "type": "object", "properties": { "effect": { "enum": ["deny", "limit"] } }, "required": ["effect"] }
+        ]
+      }
+    },
+    "terminationRoute": { "type": "string", "minLength": 3, "maxLength": 1000 },
+    "jurisdictions": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/jurisdiction" } },
+    "counselStatus": { "enum": ["not_reviewed", "required", "approved", "rejected", "expired"] },
+    "counselDecisionRef": { "$ref": "common.schema.json#/$defs/opaqueId" }
+  },
+  "oneOf": [
+    { "required": ["spdxExpression", "spdxLicenseListVersion"], "not": { "anyOf": [{ "required": ["customTermsUri"] }, { "required": ["exceptionAnalysisRef"] }] } },
+    { "required": ["customTermsUri", "customTermsDigest"], "not": { "anyOf": [{ "required": ["spdxExpression"] }, { "required": ["exceptionAnalysisRef"] }] } },
+    { "required": ["exceptionAnalysisRef"], "not": { "anyOf": [{ "required": ["spdxExpression"] }, { "required": ["customTermsUri"] }] } }
+  ],
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "active" } }, "required": ["status"] },
+      "then": {
+        "required": ["counselDecisionRef"],
+        "properties": {
+          "authority": { "type": "object", "properties": { "basis": { "not": { "const": "unknown" } }, "verified": { "const": true } }, "required": ["basis", "verified", "evidence"] },
+          "counselStatus": { "const": "approved" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "grantedActions": { "type": "array", "contains": { "const": "commercialize" } } }, "required": ["grantedActions"] },
+      "then": { "properties": { "commercialUse": { "const": true } } }
+    },
+    {
+      "if": {
+        "anyOf": [
+          { "properties": { "sublicensing": { "const": "named_recipients_only" } }, "required": ["sublicensing"] },
+          { "properties": { "recipientClasses": { "type": "array", "contains": { "enum": ["named_processor", "named_customer", "research_partner"] } } }, "required": ["recipientClasses"] }
+        ]
+      },
+      "then": { "required": ["namedRecipientRefs"] }
+    }
+  ],
+  "additionalProperties": false
+}

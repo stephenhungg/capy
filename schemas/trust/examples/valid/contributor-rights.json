@@ -1,0 +1,59 @@
+{
+  "targetSchema": "contributor-rights.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T18:00:00Z" },
+    "contributorRightsId": "ctr_2fH8mYwQ0gVxR9nP6aKd3B",
+    "contributorRef": "person_3gJ9nZxR1hWyS0pQ7bLe4C",
+    "status": "active",
+    "capacity": { "basis": "self", "verified": true, "minorOrCapacityConcern": false },
+    "notice": {
+      "noticeId": "notice_4hK0pAxS2iXzT1qR8cMf5D",
+      "version": "1.0.0",
+      "digest": { "algorithm": "sha256", "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+      "language": "en-US",
+      "presentedAt": "2026-08-30T17:50:00Z",
+      "affirmativeAction": "signed",
+      "receiptDeliveredAt": "2026-08-30T17:51:00Z",
+      "evidence": {
+        "evidenceRef": "evidence_4hK0pAxS2iXzT1qR8cMf5D",
+        "digest": {
+          "algorithm": "sha256",
+          "value": "abababababababababababababababababababababababababababababababab"
+        },
+        "mediaType": "application/pdf",
+        "accessClass": "restricted"
+      }
+    },
+    "grants": [
+      {
+        "grantId": "grant_5iL1qByT3jYaU2rS9dNg6E",
+        "usePolicyRef": "use_6jM2rCzU4kZbV3sT0eOh7F",
+        "decision": "granted",
+        "grantedAt": "2026-08-30T17:50:30Z",
+        "freelyGiven": true,
+        "compensationDependency": "necessary_core_collection",
+        "lawfulBasis": "consent"
+      }
+    ],
+    "withdrawalRoute": {
+      "method": "authenticated_portal",
+      "address": "https://capy.network/rights",
+      "noDetriment": true,
+      "asEasyAsGrant": true
+    },
+    "jurisdictions": [
+      { "country": "US", "subdivision": "US-CA", "connection": "contributor_location", "rulesetVersion": "us-ca-2026-08-30", "counselStatus": "required" }
+    ],
+    "dataCategories": ["video", "motion", "telemetry", "robot_state"],
+    "sensitiveData": { "present": false, "biometricIdentification": false, "uniqueIdentification": false },
+    "license": {
+      "rightsStatus": "owned_by_contributor",
+      "copyrightAuthority": "verified",
+      "publicityLikeness": "granted",
+      "trainingAuthorization": "express",
+      "rightsReservationDetected": false
+    },
+    "retentionRef": "ret_7kN3sDaV5lAcW4tU1fPi8G",
+    "approvedBy": { "actorRef": "actor_8lO4tEbW6mBdX5uV2gQj9H", "role": "rights_steward" }
+  }
+}

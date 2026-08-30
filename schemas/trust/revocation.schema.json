@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/revocation.schema.json",
+  "title": "capy rights revocation and post-training impact",
+  "type": "object",
+  "required": ["meta", "revocationId", "requesterRef", "requestType", "receivedAt", "state", "scope", "immediateActions", "postTrainingImpact", "lineageImpact", "modelActions", "jurisdictions", "owner"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "revocationId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "requesterRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "requestType": { "enum": ["consent_withdrawal", "rights_objection", "erasure_request", "facility_revocation", "license_termination", "legal_order", "capy_initiated"] },
+    "receivedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "verifiedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "state": { "enum": ["requested", "verified", "source_quarantined", "excluded_from_future_training", "lineage_impact_assessed", "downstream_notified", "model_action_decided", "completed", "denied_with_basis"] },
+    "scope": {
+      "type": "object",
+      "required": ["subjectRefs", "actions", "allFutureUse"],
+      "properties": {
+        "subjectRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+        "actions": { "type": "array", "minItems": 1, "items": { "enum": ["collect", "store", "train", "fine_tune", "evaluate", "share", "publish", "commercialize", "retain"] }, "uniqueItems": true },
+        "allFutureUse": { "type": "boolean" },
+        "reason": { "type": "string", "minLength": 3, "maxLength": 2000 }
+      },
+      "additionalProperties": false
+    },
+    "immediateActions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["action", "status", "targetRefs"],
+        "properties": {
+          "action": { "enum": ["suspend_use", "quarantine", "cancel_queue", "delete_source", "preserve_legal_hold", "notify_processor"] },
+          "status": { "enum": ["pending", "completed", "failed", "not_applicable"] },
+          "targetRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+          "completedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "evidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "completed" } }, "required": ["status"] },
+            "then": { "required": ["completedAt", "evidence"] }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "postTrainingImpact": { "type": "boolean" },
+    "lineageImpact": {
+      "type": "object",
+      "required": ["lineageRef", "descendantRefs", "assessedAt", "assessedBy"],
+      "properties": {
+        "lineageRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "descendantRefs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+        "assessedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "assessedBy": { "$ref": "common.schema.json#/$defs/actorRef" },
+        "assessmentEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+      },
+      "additionalProperties": false
+    },
+    "modelActions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["modelRef", "disposition", "decisionBasis", "status"],
+        "properties": {
+          "modelRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "disposition": { "enum": ["unaffected", "restricted", "unlearn", "retrain", "retire", "continue_by_exception", "unable_to_remediate"] },
+          "decisionBasis": { "type": "string", "minLength": 20, "maxLength": 4000 },
+          "status": { "enum": ["planned", "in_progress", "completed", "failed", "not_applicable"] },
+          "validationProtocolRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "residualRiskEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" },
+          "counselDecisionRef": { "$ref": "common.schema.json#/$defs/opaqueId" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "disposition": { "enum": ["unlearn", "retrain", "continue_by_exception"] } }, "required": ["disposition"] },
+            "then": { "required": ["validationProtocolRef", "counselDecisionRef"] }
+          },
+          {
+            "if": { "properties": { "disposition": { "enum": ["unlearn", "retrain"] }, "status": { "const": "completed" } }, "required": ["disposition", "status"] },
+            "then": { "required": ["residualRiskEvidence"] }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "downstreamNotices": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/evidenceRef" } },
+    "jurisdictions": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/jurisdiction" } },
+    "owner": { "$ref": "common.schema.json#/$defs/actorRef" },
+    "closedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "denialBasis": { "type": "string", "minLength": 20, "maxLength": 4000 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "const": "completed" } }, "required": ["state"] },
+      "then": {
+        "required": ["closedAt"],
+        "properties": {
+          "immediateActions": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "object", "properties": { "status": { "enum": ["completed", "not_applicable"] } }, "required": ["status"] }
+          },
+          "modelActions": {
+            "type": "array",
+            "items": { "type": "object", "properties": { "status": { "enum": ["completed", "not_applicable"] } }, "required": ["status"] }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "state": { "const": "denied_with_basis" } }, "required": ["state"] },
+      "then": { "required": ["closedAt", "denialBasis"] }
+    },
+    {
+      "if": { "properties": { "postTrainingImpact": { "const": true } }, "required": ["postTrainingImpact"] },
+      "then": { "properties": { "modelActions": { "type": "array", "minItems": 1 } } }
+    }
+  ],
+  "additionalProperties": false
+}

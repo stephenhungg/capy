@@ -1,0 +1,25 @@
+{
+  "targetSchema": "trust-gate.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T21:00:00Z" },
+    "trustGateId": "gate_8vY4dOlG6wLnH5eF2qAt9S",
+    "gate": "train",
+    "subjectRefs": ["entity_0nQ6vGdY8oDfZ7wX4iSl1K"],
+    "requestedAction": "train",
+    "purposeRef": "purpose_9wZ5ePmH7xMoI6fG3rBu0T",
+    "actor": { "actorRef": "actor_0xA6fQnI8yNpJ7gH4sCv1U", "role": "service" },
+    "evaluatedAt": "2026-08-30T21:00:00Z",
+    "evidenceVersions": [
+      {
+        "recordRef": "ctr_2fH8mYwQ0gVxR9nP6aKd3B",
+        "recordType": "contributor_rights",
+        "digest": { "algorithm": "sha256", "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" }
+      }
+    ],
+    "checks": [{ "check": "license", "result": "unknown", "reasonCode": "license.missing" }],
+    "decision": "allow",
+    "reasonCodes": ["bad_allow"],
+    "expiresAt": "2026-08-31T21:00:00Z",
+    "decisionBy": { "actorRef": "actor_1yB7gRoJ9zOqK8hI5tDw2V", "role": "rights_steward" }
+  }
+}

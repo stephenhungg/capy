@@ -1,0 +1,65 @@
+{
+  "targetSchema": "lineage.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T19:00:00Z" },
+    "lineageId": "lin_9mP5uFcX7nCeY6vW3hRk0J",
+    "entities": [
+      {
+        "entityId": "entity_5sV1aLiD3tIkE2bC9nXq6P",
+        "entityType": "normalized_episode",
+        "createdAt": "2026-08-30T18:10:00Z",
+        "digest": { "algorithm": "sha256", "value": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" },
+        "availability": "available",
+        "accessClass": "restricted",
+        "rightsRefs": ["ctr_2fH8mYwQ0gVxR9nP6aKd3B"],
+        "licenseRefs": ["lic_6tW2bMjE4uJlF3cD0oYr7Q"],
+        "retentionRef": "ret_7kN3sDaV5lAcW4tU1fPi8G"
+      },
+      {
+        "entityId": "entity_0nQ6vGdY8oDfZ7wX4iSl1K",
+        "entityType": "cohort_manifest",
+        "createdAt": "2026-08-30T18:30:00Z",
+        "digest": { "algorithm": "sha256", "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" },
+        "availability": "available",
+        "accessClass": "restricted",
+        "rightsRefs": ["ctr_2fH8mYwQ0gVxR9nP6aKd3B"],
+        "licenseRefs": ["lic_6tW2bMjE4uJlF3cD0oYr7Q"],
+        "retentionRef": "ret_7kN3sDaV5lAcW4tU1fPi8G"
+      }
+    ],
+    "activities": [
+      {
+        "activityId": "act_1oR7wHeZ9pEgA8xY5jTm2L",
+        "activityType": "assemble_cohort",
+        "startedAt": "2026-08-30T18:20:00Z",
+        "endedAt": "2026-08-30T18:30:00Z",
+        "actor": { "actorRef": "actor_2pS8xIfA0qFhB9yZ6kUn3M", "role": "service" },
+        "inputEntityRefs": ["entity_5sV1aLiD3tIkE2bC9nXq6P"],
+        "outputEntityRefs": ["entity_0nQ6vGdY8oDfZ7wX4iSl1K"],
+        "gateDecisionRef": "gate_3qT9yJgB1rGiC0zA7lVo4N",
+        "outcome": "succeeded"
+      }
+    ],
+    "relations": [
+      {
+        "relation": "wasDerivedFrom",
+        "fromRef": "entity_0nQ6vGdY8oDfZ7wX4iSl1K",
+        "toRef": "entity_5sV1aLiD3tIkE2bC9nXq6P",
+        "recordedAt": "2026-08-30T18:30:01Z"
+      },
+      {
+        "relation": "wasGeneratedBy",
+        "fromRef": "entity_0nQ6vGdY8oDfZ7wX4iSl1K",
+        "toRef": "act_1oR7wHeZ9pEgA8xY5jTm2L",
+        "recordedAt": "2026-08-30T18:30:01Z"
+      }
+    ],
+    "graphDigest": { "algorithm": "sha256", "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" },
+    "signedBy": { "actorRef": "actor_4rU0zKhC2sHjD1aB8mWp5O", "role": "lineage_owner" },
+    "signatureEvidence": {
+      "evidenceRef": "ev_7uX3cNkF5vKmG4dE1pZs8R",
+      "digest": { "algorithm": "sha256", "value": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" },
+      "accessClass": "restricted"
+    }
+  }
+}

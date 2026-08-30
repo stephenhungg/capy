@@ -1,0 +1,25 @@
+{
+  "targetSchema": "evaluator-conflict.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "evaluatorConflictId": "conflict_1234567890123456789012",
+    "evaluatorRef": "evaluator_1234567890123456789012",
+    "evaluationRef": "evaluation_1234567890123456789012",
+    "disclosures": {
+      "candidateAuthorship": false,
+      "trainingInvolvement": false,
+      "dataInvolvement": false,
+      "protocolInvolvement": false,
+      "financialInterest": false,
+      "reportingRelationship": false,
+      "personalRelationship": false,
+      "priorAdvocacy": false,
+      "identityUnblinded": false
+    },
+    "submittedAt": "2026-08-30T11:50:00Z",
+    "decision": "none",
+    "decidedBy": { "actorRef": "approver_1234567890123456789012", "role": "evaluation_approver" },
+    "decisionMakerIndependent": true,
+    "decidedAt": "2026-08-30T12:00:00Z"
+  }
+}

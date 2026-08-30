@@ -1,0 +1,27 @@
+{
+  "targetSchema": "license.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "licenseRecordId": "license_1234567890123456789012",
+    "subjectRefs": ["dataset_1234567890123456789012"],
+    "status": "draft",
+    "rightsHolderRef": "holder_1234567890123456789012",
+    "authority": { "basis": "owner", "verified": false },
+    "rightsCategories": ["copyright", "database_right"],
+    "spdxExpression": "CC-BY-4.0",
+    "spdxLicenseListVersion": "3.26.0",
+    "grantedActions": ["copy", "train"],
+    "commercialUse": false,
+    "sublicensing": "prohibited",
+    "validFrom": "2026-08-30T12:00:00Z",
+    "territories": ["US"],
+    "recipientClasses": ["capy_internal"],
+    "reservations": [
+      { "code": "no.public.release", "effect": "deny" }
+    ],
+    "jurisdictions": [
+      { "country": "US", "connection": "collection_location", "rulesetVersion": "us-2026-08", "counselStatus": "required" }
+    ],
+    "counselStatus": "required"
+  }
+}

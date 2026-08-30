@@ -1,0 +1,23 @@
+{
+  "targetSchema": "dispute.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "disputeId": "dispute_1234567890123456789012",
+    "complainantRef": "person_1234567890123456789012",
+    "type": "contribution",
+    "subjectRefs": ["receipt_1234567890123456789012"],
+    "receivedAt": "2026-08-30T12:00:00Z",
+    "acknowledgementDueAt": "2026-09-02T12:00:00Z",
+    "riskDecisionDueAt": "2026-09-04T12:00:00Z",
+    "outcomeDueAt": "2026-09-29T12:00:00Z",
+    "state": "received",
+    "urgency": "routine",
+    "interimSafeguards": ["preserve_evidence"],
+    "reviewerRef": "reviewer_1234567890123456789012",
+    "reviewerConflictRef": "conflict_1234567890123456789012",
+    "nonRetaliation": true,
+    "jurisdictions": [
+      { "country": "US", "connection": "contributor_location", "rulesetVersion": "us-2026-08", "counselStatus": "required" }
+    ]
+  }
+}

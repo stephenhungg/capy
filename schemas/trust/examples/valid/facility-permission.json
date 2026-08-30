@@ -1,0 +1,37 @@
+{
+  "targetSchema": "facility-permission.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "facilityPermissionId": "facilityperm_1234567890123456789012",
+    "facilityRef": "facility_1234567890123456789012",
+    "status": "draft",
+    "grantor": { "actorRef": "grantor_1234567890123456789012", "role": "facility_authority" },
+    "authority": {
+      "basis": "operator",
+      "verifiedAt": "2026-08-30T11:00:00Z",
+      "verifiedBy": { "actorRef": "steward_1234567890123456789012", "role": "rights_steward" }
+    },
+    "validFrom": "2026-09-01T00:00:00Z",
+    "zones": ["zone_1234567890123456789012"],
+    "modalities": ["video", "robot_state"],
+    "equipmentClasses": ["mobile manipulator"],
+    "bystanderControl": { "expected": false, "strategy": "not_applicable", "rawProcessingApproved": false },
+    "safety": {
+      "riskAssessmentRef": "risk_1234567890123456789012",
+      "supervisorRequired": true,
+      "stopWorkRole": "site supervisor",
+      "emergencyContactRef": "contact_1234567890123456789012"
+    },
+    "thirdPartyMaterials": { "mayAppear": false, "handling": "not_applicable" },
+    "jurisdictions": [
+      { "country": "US", "connection": "facility_location", "rulesetVersion": "us-2026-08", "counselStatus": "required" }
+    ],
+    "usePolicyRefs": ["usepolicy_1234567890123456789012"],
+    "revocationRoute": "restricted facility permission portal",
+    "evidence": {
+      "evidenceRef": "evidence_1234567890123456789012",
+      "digest": { "algorithm": "sha256", "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+      "accessClass": "restricted"
+    }
+  }
+}

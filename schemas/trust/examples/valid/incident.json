@@ -1,0 +1,45 @@
+{
+  "targetSchema": "incident.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "incidentId": "incident_1234567890123456789012",
+    "type": "redaction_failure",
+    "severity": "sev2",
+    "detectedAt": "2026-08-30T11:30:00Z",
+    "state": "declared",
+    "reportedBy": { "actorRef": "reporter_1234567890123456789012", "role": "service" },
+    "commander": { "actorRef": "commander_1234567890123456789012", "role": "incident_commander" },
+    "affectedRefs": ["capture_1234567890123456789012"],
+    "containment": [
+      { "action": "remove_publication", "status": "in_progress", "owner": { "actorRef": "commander_1234567890123456789012", "role": "incident_commander" } }
+    ],
+    "jurisdictions": [
+      { "country": "US", "connection": "storage_location", "rulesetVersion": "us-2026-08", "counselStatus": "required" }
+    ],
+    "notificationDecisions": [
+      {
+        "audience": "contributor",
+        "required": false,
+        "decisionAt": "2026-08-30T11:45:00Z",
+        "decidedBy": { "actorRef": "privacy_1234567890123456789012", "role": "privacy_owner" },
+        "counselDecisionRef": "counsel_1234567890123456789012",
+        "basis": "assessment is still in progress"
+      }
+    ],
+    "evidencePreservation": [
+      {
+        "evidenceRef": "evidence_1234567890123456789012",
+        "digest": { "algorithm": "sha256", "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" },
+        "accessClass": "restricted"
+      }
+    ],
+    "correctiveActions": [
+      {
+        "action": "measure redaction recall and correct the pipeline",
+        "owner": { "actorRef": "privacy_1234567890123456789012", "role": "privacy_owner" },
+        "dueAt": "2026-09-05T12:00:00Z",
+        "status": "planned"
+      }
+    ]
+  }
+}

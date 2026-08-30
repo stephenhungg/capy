@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/jurisdiction-assessment.schema.json",
+  "title": "capy jurisdiction and legal-routing assessment",
+  "type": "object",
+  "required": ["meta", "jurisdictionAssessmentId", "processingRef", "status", "locations", "roles", "riskFactors", "purposeDecisions", "counselReview", "effectiveFrom", "reviewAt"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "jurisdictionAssessmentId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "processingRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "status": { "enum": ["draft", "counsel_required", "approved", "rejected", "expired", "superseded"] },
+    "locations": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/jurisdiction" } },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["actorRef", "role"],
+        "properties": {
+          "actorRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "role": { "enum": ["controller", "joint_controller", "processor", "subprocessor", "employer", "independent_contractor", "facility_operator", "data_exporter", "data_importer", "payout_operator"] },
+          "basis": { "type": "string", "minLength": 3, "maxLength": 1000 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "riskFactors": {
+      "type": "object",
+      "required": ["minorOrCapacity", "biometricOrUniqueIdentification", "workplaceMonitoring", "recordingConsent", "specialCategoryOrSensitiveData", "crossBorderTransfer", "sectorRule", "exportControl", "paymentOrTax", "unknownFacts"],
+      "properties": {
+        "minorOrCapacity": { "type": "boolean" },
+        "biometricOrUniqueIdentification": { "type": "boolean" },
+        "workplaceMonitoring": { "type": "boolean" },
+        "recordingConsent": { "type": "boolean" },
+        "specialCategoryOrSensitiveData": { "type": "boolean" },
+        "crossBorderTransfer": { "type": "boolean" },
+        "sectorRule": { "type": "boolean" },
+        "exportControl": { "type": "boolean" },
+        "paymentOrTax": { "type": "boolean" },
+        "unknownFacts": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "purposeDecisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["usePolicyRef", "lawfulBasis", "transferMechanism", "decision", "rightsRequestDeadlineRuleset", "incidentNotificationRuleset"],
+        "properties": {
+          "usePolicyRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "lawfulBasis": { "enum": ["consent", "contract", "legal_obligation", "vital_interests", "public_task", "legitimate_interests", "not_personal_data", "other_counsel_approved"] },
+          "specialCategoryCondition": { "type": "string", "minLength": 3, "maxLength": 256 },
+          "transferMechanism": { "enum": ["not_applicable", "adequacy", "scc", "bcr", "derogation", "local_only", "other_counsel_approved"] },
+          "decision": { "enum": ["allow", "deny", "counsel_required"] },
+          "rightsRequestDeadlineRuleset": { "type": "string", "minLength": 3, "maxLength": 256 },
+          "incidentNotificationRuleset": { "type": "string", "minLength": 3, "maxLength": 256 },
+          "evidenceRefs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/evidenceRef" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "counselReview": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["not_reviewed", "required", "approved", "rejected", "expired"] },
+        "decisionRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "reviewedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "reviewerRef": { "$ref": "common.schema.json#/$defs/opaqueId" }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "enum": ["approved", "rejected"] } }, "required": ["status"] }, "then": { "required": ["decisionRef", "reviewedAt", "reviewerRef"] } }
+      ],
+      "additionalProperties": false
+    },
+    "effectiveFrom": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "effectiveUntil": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "reviewAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "approved" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "counselReview": { "type": "object", "properties": { "status": { "const": "approved" } }, "required": ["status"] },
+          "riskFactors": { "type": "object", "properties": { "unknownFacts": { "const": false } }, "required": ["unknownFacts"] },
+          "locations": {
+            "type": "array",
+            "items": { "type": "object", "properties": { "counselStatus": { "const": "approved" } }, "required": ["counselStatus"] }
+          },
+          "purposeDecisions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "decision": { "enum": ["allow", "deny"] },
+                "evidenceRefs": { "type": "array", "minItems": 1 }
+              },
+              "required": ["decision", "evidenceRefs"]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "riskFactors": { "type": "object", "properties": { "crossBorderTransfer": { "const": true } }, "required": ["crossBorderTransfer"] } }, "required": ["riskFactors"] },
+      "then": {
+        "properties": {
+          "purposeDecisions": {
+            "type": "array",
+            "items": { "type": "object", "properties": { "transferMechanism": { "not": { "const": "not_applicable" } } }, "required": ["transferMechanism"] }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "riskFactors": {
+            "type": "object",
+            "anyOf": [
+              { "properties": { "biometricOrUniqueIdentification": { "const": true } }, "required": ["biometricOrUniqueIdentification"] },
+              { "properties": { "specialCategoryOrSensitiveData": { "const": true } }, "required": ["specialCategoryOrSensitiveData"] }
+            ]
+          }
+        },
+        "required": ["riskFactors"]
+      },
+      "then": {
+        "properties": {
+          "purposeDecisions": {
+            "type": "array",
+            "items": { "type": "object", "required": ["specialCategoryCondition"] }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

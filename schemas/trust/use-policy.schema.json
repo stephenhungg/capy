@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/use-policy.schema.json",
+  "title": "capy intended use policy",
+  "type": "object",
+  "required": ["meta", "usePolicyId", "status", "purpose", "actions", "artifactTypes", "recipientClasses", "commercialUse", "validFrom", "jurisdictions", "prohibitions"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "usePolicyId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "status": { "enum": ["draft", "active", "suspended", "expired", "superseded"] },
+    "purpose": {
+      "type": "object",
+      "required": ["purposeId", "plainLanguage", "capabilityRefs"],
+      "properties": {
+        "purposeId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "plainLanguage": { "type": "string", "minLength": 20, "maxLength": 2000 },
+        "capabilityRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["collect", "store", "redact", "normalize", "train", "fine_tune", "evaluate", "safety_test", "share_internal", "share_processor", "share_third_party", "publish_dataset", "publish_media", "publish_metrics", "commercialize", "derive", "retain", "delete"]
+      }
+    },
+    "artifactTypes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["raw_capture", "redacted_capture", "normalized_episode", "cohort_manifest", "dataset", "code", "configuration", "environment", "base_model", "model_checkpoint", "evaluation_protocol", "evaluation_result", "capability_receipt", "contribution_calculation", "settlement_proof"] }
+    },
+    "recipientClasses": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["capy_internal", "named_processor", "named_customer", "research_partner", "general_public"] }
+    },
+    "namedRecipientRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "commercialUse": { "type": "boolean" },
+    "validFrom": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "validUntil": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "jurisdictions": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/jurisdiction" } },
+    "prohibitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "allOf": [
+          { "$ref": "common.schema.json#/$defs/restriction" },
+          { "type": "object", "properties": { "effect": { "const": "deny" } }, "required": ["effect"] }
+        ]
+      }
+    },
+    "duties": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "common.schema.json#/$defs/restriction" },
+          { "type": "object", "properties": { "effect": { "enum": ["require", "limit"] } }, "required": ["effect"] }
+        ]
+      }
+    },
+    "riskAssessmentRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "approvedBy": { "$ref": "common.schema.json#/$defs/actorRef" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "active" } }, "required": ["status"] },
+      "then": { "required": ["approvedBy", "riskAssessmentRef", "validUntil"] }
+    },
+    {
+      "if": { "properties": { "recipientClasses": { "type": "array", "contains": { "enum": ["named_processor", "named_customer", "research_partner"] } } }, "required": ["recipientClasses"] },
+      "then": { "required": ["namedRecipientRefs"] }
+    }
+  ],
+  "additionalProperties": false
+}

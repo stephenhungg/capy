@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/lineage.schema.json",
+  "title": "capy dataset and model lineage graph",
+  "type": "object",
+  "required": ["meta", "lineageId", "entities", "activities", "relations", "graphDigest", "signedBy", "signatureEvidence"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "lineageId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["entityId", "entityType", "createdAt", "availability", "accessClass", "rightsRefs", "licenseRefs", "retentionRef"],
+        "properties": {
+          "entityId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "entityType": { "enum": ["raw_capture", "redacted_capture", "normalized_episode", "cohort_manifest", "dataset", "code", "configuration", "environment", "base_model", "model_checkpoint", "evaluation_protocol", "evaluation_result", "capability_receipt", "contribution_calculation", "settlement_proof"] },
+          "createdAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "digest": { "$ref": "common.schema.json#/$defs/digest" },
+          "digestUnavailableReason": { "type": "string", "minLength": 10, "maxLength": 1000 },
+          "availability": { "enum": ["available", "quarantined", "restricted", "deleted", "retired", "superseded"] },
+          "accessClass": { "enum": ["internal", "restricted", "highly_restricted", "public"] },
+          "rightsRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+          "licenseRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+          "retentionRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "c2pa": {
+            "type": "object",
+            "required": ["manifestRef", "specVersion", "validationStatus", "validatedAt"],
+            "properties": {
+              "manifestRef": { "$ref": "common.schema.json#/$defs/evidenceRef" },
+              "specVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$" },
+              "validationStatus": { "enum": ["valid_trusted", "valid_untrusted", "invalid", "unknown_provenance"] },
+              "validatedAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+            },
+            "additionalProperties": false
+          },
+          "externalMetadata": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["standard", "uri", "digest"],
+              "properties": {
+                "standard": { "enum": ["croissant-1.1", "croissant-rai-1.0", "spdx-3.0.1", "prov-o", "other"] },
+                "uri": { "type": "string", "format": "uri" },
+                "digest": { "$ref": "common.schema.json#/$defs/digest" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "oneOf": [
+          { "required": ["digest"], "not": { "required": ["digestUnavailableReason"] } },
+          { "required": ["digestUnavailableReason"], "not": { "required": ["digest"] } }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "activities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["activityId", "activityType", "startedAt", "endedAt", "actor", "inputEntityRefs", "outputEntityRefs", "gateDecisionRef", "outcome"],
+        "properties": {
+          "activityId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "activityType": { "enum": ["collect", "redact", "normalize", "assemble_cohort", "split_dataset", "train", "fine_tune", "evaluate", "issue_receipt", "calculate_contribution", "settle", "delete", "unlearn", "retrain"] },
+          "startedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "endedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "actor": { "$ref": "common.schema.json#/$defs/actorRef" },
+          "inputEntityRefs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+          "outputEntityRefs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+          "gateDecisionRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "codeRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "configurationRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "environmentRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "randomSeedRef": { "$ref": "common.schema.json#/$defs/evidenceRef" },
+          "datasetRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+          "splitManifestRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "baseModelRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "baseModelLicenseRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "privacyTransformRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+          "gateInputSetDigest": { "$ref": "common.schema.json#/$defs/digest" },
+          "evaluatorConflictRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "outcome": { "enum": ["succeeded", "failed", "cancelled", "partial"] }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "activityType": { "enum": ["train", "fine_tune", "unlearn", "retrain"] } }, "required": ["activityType"] },
+            "then": {
+              "required": ["codeRef", "configurationRef", "environmentRef", "datasetRefs", "splitManifestRef", "baseModelRef", "baseModelLicenseRef", "privacyTransformRefs", "gateInputSetDigest"],
+              "properties": {
+                "inputEntityRefs": { "type": "array", "minItems": 1 },
+                "outputEntityRefs": { "type": "array", "minItems": 1 }
+              }
+            }
+          },
+          {
+            "if": { "properties": { "activityType": { "const": "evaluate" } }, "required": ["activityType"] },
+            "then": { "required": ["evaluatorConflictRef"] }
+          },
+          {
+            "if": { "properties": { "activityType": { "enum": ["assemble_cohort", "split_dataset"] } }, "required": ["activityType"] },
+            "then": {
+              "properties": {
+                "inputEntityRefs": { "type": "array", "minItems": 1 },
+                "outputEntityRefs": { "type": "array", "minItems": 1 }
+              }
+            }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "relations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["relation", "fromRef", "toRef", "recordedAt"],
+        "properties": {
+          "relation": { "enum": ["wasDerivedFrom", "used", "wasGeneratedBy", "wasAssociatedWith", "wasAttributedTo", "wasInvalidatedBy", "wasInformedBy"] },
+          "fromRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "toRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "recordedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "role": { "type": "string", "minLength": 1, "maxLength": 128 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "graphDigest": { "$ref": "common.schema.json#/$defs/digest" },
+    "signedBy": { "$ref": "common.schema.json#/$defs/actorRef" },
+    "signatureEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/evaluator-conflict.schema.json",
+  "title": "capy evaluator conflict disclosure",
+  "type": "object",
+  "required": ["meta", "evaluatorConflictId", "evaluatorRef", "evaluationRef", "disclosures", "submittedAt", "decision", "decidedBy", "decisionMakerIndependent", "decidedAt"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "evaluatorConflictId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "evaluatorRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "evaluationRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "disclosures": {
+      "type": "object",
+      "required": ["candidateAuthorship", "trainingInvolvement", "dataInvolvement", "protocolInvolvement", "financialInterest", "reportingRelationship", "personalRelationship", "priorAdvocacy", "identityUnblinded"],
+      "properties": {
+        "candidateAuthorship": { "type": "boolean" },
+        "trainingInvolvement": { "type": "boolean" },
+        "dataInvolvement": { "type": "boolean" },
+        "protocolInvolvement": { "type": "boolean" },
+        "financialInterest": { "type": "boolean" },
+        "reportingRelationship": { "type": "boolean" },
+        "personalRelationship": { "type": "boolean" },
+        "priorAdvocacy": { "type": "boolean" },
+        "identityUnblinded": { "type": "boolean" },
+        "detailsEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+      },
+      "additionalProperties": false
+    },
+    "submittedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "decision": { "enum": ["none", "managed", "disqualifying"] },
+    "mitigations": { "type": "array", "items": { "enum": ["recusal", "blinded_analysis", "independent_replication", "second_approval", "protocol_preregistration", "access_restriction"] }, "uniqueItems": true },
+    "decidedBy": { "$ref": "common.schema.json#/$defs/actorRef" },
+    "decisionMakerIndependent": { "const": true },
+    "decidedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "rationale": { "type": "string", "minLength": 20, "maxLength": 4000 },
+    "independentApproverRef": { "$ref": "common.schema.json#/$defs/opaqueId" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "decision": { "const": "none" } }, "required": ["decision"] },
+      "then": {
+        "properties": {
+          "disclosures": {
+            "type": "object",
+            "properties": {
+              "candidateAuthorship": { "const": false },
+              "trainingInvolvement": { "const": false },
+              "dataInvolvement": { "const": false },
+              "protocolInvolvement": { "const": false },
+              "financialInterest": { "const": false },
+              "reportingRelationship": { "const": false },
+              "personalRelationship": { "const": false },
+              "priorAdvocacy": { "const": false },
+              "identityUnblinded": { "const": false }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "disclosures": {
+            "type": "object",
+            "anyOf": [
+              { "properties": { "candidateAuthorship": { "const": true } }, "required": ["candidateAuthorship"] },
+              { "properties": { "trainingInvolvement": { "const": true } }, "required": ["trainingInvolvement"] },
+              { "properties": { "dataInvolvement": { "const": true } }, "required": ["dataInvolvement"] },
+              { "properties": { "protocolInvolvement": { "const": true } }, "required": ["protocolInvolvement"] },
+              { "properties": { "financialInterest": { "const": true } }, "required": ["financialInterest"] },
+              { "properties": { "reportingRelationship": { "const": true } }, "required": ["reportingRelationship"] },
+              { "properties": { "personalRelationship": { "const": true } }, "required": ["personalRelationship"] },
+              { "properties": { "priorAdvocacy": { "const": true } }, "required": ["priorAdvocacy"] },
+              { "properties": { "identityUnblinded": { "const": true } }, "required": ["identityUnblinded"] }
+            ]
+          }
+        },
+        "required": ["disclosures"]
+      },
+      "then": { "properties": { "decision": { "enum": ["managed", "disqualifying"] } } }
+    },
+    { "if": { "properties": { "decision": { "const": "managed" } }, "required": ["decision"] }, "then": { "required": ["mitigations", "rationale", "independentApproverRef"], "properties": { "mitigations": { "type": "array", "minItems": 1 } } } },
+    { "if": { "properties": { "decision": { "const": "disqualifying" } }, "required": ["decision"] }, "then": { "required": ["rationale", "mitigations"], "properties": { "mitigations": { "type": "array", "contains": { "const": "recusal" } } } } }
+  ],
+  "additionalProperties": false
+}

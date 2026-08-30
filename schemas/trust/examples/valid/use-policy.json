@@ -1,0 +1,24 @@
+{
+  "targetSchema": "use-policy.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "usePolicyId": "usepolicy_1234567890123456789012",
+    "status": "draft",
+    "purpose": {
+      "purposeId": "purpose_1234567890123456789012",
+      "plainLanguage": "train a manipulation policy for the named capability",
+      "capabilityRefs": ["capability_1234567890123456789012"]
+    },
+    "actions": ["collect", "train", "evaluate"],
+    "artifactTypes": ["raw_capture", "dataset", "model_checkpoint"],
+    "recipientClasses": ["capy_internal"],
+    "commercialUse": false,
+    "validFrom": "2026-08-30T12:00:00Z",
+    "jurisdictions": [
+      { "country": "US", "connection": "collection_location", "rulesetVersion": "us-2026-08", "counselStatus": "required" }
+    ],
+    "prohibitions": [
+      { "code": "no.public.release", "effect": "deny" }
+    ]
+  }
+}

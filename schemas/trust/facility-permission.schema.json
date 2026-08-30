@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/facility-permission.schema.json",
+  "title": "capy facility permission",
+  "type": "object",
+  "required": ["meta", "facilityPermissionId", "facilityRef", "status", "grantor", "authority", "validFrom", "zones", "modalities", "equipmentClasses", "bystanderControl", "safety", "thirdPartyMaterials", "jurisdictions", "usePolicyRefs", "revocationRoute", "evidence"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "facilityPermissionId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "facilityRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "status": { "enum": ["draft", "active", "suspended", "revoked", "expired", "superseded"] },
+    "grantor": { "$ref": "common.schema.json#/$defs/actorRef" },
+    "authority": {
+      "type": "object",
+      "required": ["basis", "verifiedAt", "verifiedBy"],
+      "properties": {
+        "basis": { "enum": ["owner", "tenant", "operator", "contractual_delegate", "public_authority", "other_counsel_approved"] },
+        "verifiedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "verifiedBy": { "$ref": "common.schema.json#/$defs/actorRef" },
+        "evidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+      },
+      "additionalProperties": false
+    },
+    "validFrom": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "validUntil": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "zones": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "modalities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["video", "image", "audio", "depth", "lidar", "motion", "telemetry", "network", "robot_state", "environment_map"] } },
+    "equipmentClasses": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 2, "maxLength": 128 }, "uniqueItems": true },
+    "bystanderControl": {
+      "type": "object",
+      "required": ["expected", "strategy", "rawProcessingApproved"],
+      "properties": {
+        "expected": { "type": "boolean" },
+        "strategy": { "enum": ["exclusion_zone", "individual_consent", "real_time_masking", "sensor_minimization", "post_capture_redaction", "not_applicable", "collection_prohibited"] },
+        "rawProcessingApproved": { "type": "boolean" },
+        "requirements": { "type": "array", "items": { "allOf": [{ "$ref": "common.schema.json#/$defs/restriction" }, { "type": "object", "properties": { "effect": { "enum": ["deny", "require", "limit"] } }, "required": ["effect"] }] } }
+      },
+      "additionalProperties": false
+    },
+    "safety": {
+      "type": "object",
+      "required": ["riskAssessmentRef", "supervisorRequired", "stopWorkRole", "emergencyContactRef"],
+      "properties": {
+        "riskAssessmentRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "supervisorRequired": { "type": "boolean" },
+        "stopWorkRole": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "emergencyContactRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "prerequisites": { "type": "array", "items": { "allOf": [{ "$ref": "common.schema.json#/$defs/restriction" }, { "type": "object", "properties": { "effect": { "enum": ["deny", "require", "limit"] } }, "required": ["effect"] }] } }
+      },
+      "additionalProperties": false
+    },
+    "thirdPartyMaterials": {
+      "type": "object",
+      "required": ["mayAppear", "handling"],
+      "properties": {
+        "mayAppear": { "type": "boolean" },
+        "handling": { "enum": ["exclude", "redact", "separate_license", "counsel_review", "not_applicable"] },
+        "licenseEvidenceRefs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/evidenceRef" } }
+      },
+      "additionalProperties": false
+    },
+    "jurisdictions": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/jurisdiction" } },
+    "usePolicyRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "restrictions": { "type": "array", "items": { "allOf": [{ "$ref": "common.schema.json#/$defs/restriction" }, { "type": "object", "properties": { "effect": { "enum": ["deny", "require", "limit"] } }, "required": ["effect"] }] } },
+    "revocationRoute": { "type": "string", "minLength": 3, "maxLength": 512 },
+    "evidence": { "$ref": "common.schema.json#/$defs/evidenceRef" },
+    "approvedBy": { "$ref": "common.schema.json#/$defs/actorRef" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "active" } }, "required": ["status"] },
+      "then": {
+        "required": ["approvedBy", "validUntil"],
+        "properties": { "authority": { "type": "object", "required": ["evidence"] } }
+      }
+    },
+    {
+      "if": { "properties": { "bystanderControl": { "type": "object", "properties": { "expected": { "const": true } }, "required": ["expected"] } } },
+      "then": {
+        "properties": {
+          "bystanderControl": {
+            "type": "object",
+            "properties": {
+              "strategy": { "not": { "const": "not_applicable" } }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

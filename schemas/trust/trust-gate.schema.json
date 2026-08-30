@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/trust-gate.schema.json",
+  "title": "capy fail-closed trust gate decision",
+  "$defs": {
+    "checkResult": {
+      "type": "object",
+      "required": ["result", "reasonCode", "evidenceRef"],
+      "properties": {
+        "result": { "enum": ["pass", "fail", "unknown", "not_applicable"] },
+        "reasonCode": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{2,63}$" },
+        "evidenceRef": { "$ref": "common.schema.json#/$defs/opaqueId" }
+      },
+      "additionalProperties": false
+    },
+    "passResult": {
+      "allOf": [
+        { "$ref": "#/$defs/checkResult" },
+        { "type": "object", "properties": { "result": { "const": "pass" } }, "required": ["result"] }
+      ]
+    },
+    "recordSnapshot": {
+      "type": "object",
+      "required": ["recordRef", "digest"],
+      "properties": {
+        "recordRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "digest": { "$ref": "common.schema.json#/$defs/digest" }
+      },
+      "additionalProperties": false
+    },
+    "evidenceSet": {
+      "type": "object",
+      "properties": {
+        "use_policy": { "$ref": "#/$defs/recordSnapshot" },
+        "contributor_rights": { "$ref": "#/$defs/recordSnapshot" },
+        "facility_permission": { "$ref": "#/$defs/recordSnapshot" },
+        "jurisdiction_assessment": { "$ref": "#/$defs/recordSnapshot" },
+        "redaction": { "$ref": "#/$defs/recordSnapshot" },
+        "lineage": { "$ref": "#/$defs/recordSnapshot" },
+        "revocation": { "$ref": "#/$defs/recordSnapshot" },
+        "dispute": { "$ref": "#/$defs/recordSnapshot" },
+        "evaluator_conflict": { "$ref": "#/$defs/recordSnapshot" },
+        "wallet_binding": { "$ref": "#/$defs/recordSnapshot" },
+        "retention": { "$ref": "#/$defs/recordSnapshot" },
+        "incident": { "$ref": "#/$defs/recordSnapshot" },
+        "risk_assessment": { "$ref": "#/$defs/recordSnapshot" },
+        "license": { "$ref": "#/$defs/recordSnapshot" }
+      },
+      "additionalProperties": false
+    },
+    "collectionEvidence": {
+      "allOf": [
+        { "$ref": "#/$defs/evidenceSet" },
+        { "type": "object", "required": ["use_policy", "contributor_rights", "facility_permission", "jurisdiction_assessment", "revocation", "dispute", "retention", "incident", "risk_assessment", "license"] }
+      ]
+    },
+    "dataReadyEvidence": {
+      "allOf": [
+        { "$ref": "#/$defs/collectionEvidence" },
+        { "type": "object", "required": ["redaction", "lineage"] }
+      ]
+    },
+    "evaluationEvidence": {
+      "allOf": [
+        { "$ref": "#/$defs/dataReadyEvidence" },
+        { "type": "object", "required": ["evaluator_conflict"] }
+      ]
+    },
+    "payoutEvidence": {
+      "allOf": [
+        { "$ref": "#/$defs/collectionEvidence" },
+        { "type": "object", "required": ["lineage", "wallet_binding"] }
+      ]
+    },
+    "collectionChecks": {
+      "type": "object",
+      "required": ["purpose", "action", "time", "territory", "recipient", "artifact", "contributor_rights", "facility_authority", "lawful_basis", "license", "retention", "revocation", "dispute_hold", "incident_block", "safety"],
+      "properties": {
+        "purpose": { "$ref": "#/$defs/passResult" },
+        "action": { "$ref": "#/$defs/passResult" },
+        "time": { "$ref": "#/$defs/passResult" },
+        "territory": { "$ref": "#/$defs/passResult" },
+        "recipient": { "$ref": "#/$defs/passResult" },
+        "artifact": { "$ref": "#/$defs/passResult" },
+        "contributor_rights": { "$ref": "#/$defs/passResult" },
+        "facility_authority": { "$ref": "#/$defs/passResult" },
+        "lawful_basis": { "$ref": "#/$defs/passResult" },
+        "license": { "$ref": "#/$defs/passResult" },
+        "retention": { "$ref": "#/$defs/passResult" },
+        "revocation": { "$ref": "#/$defs/passResult" },
+        "dispute_hold": { "$ref": "#/$defs/passResult" },
+        "incident_block": { "$ref": "#/$defs/passResult" },
+        "safety": { "$ref": "#/$defs/passResult" }
+      }
+    },
+    "dataReadyChecks": {
+      "allOf": [
+        { "$ref": "#/$defs/collectionChecks" },
+        {
+          "type": "object",
+          "required": ["redaction", "lineage"],
+          "properties": {
+            "redaction": { "$ref": "#/$defs/passResult" },
+            "lineage": { "$ref": "#/$defs/passResult" }
+          }
+        }
+      ]
+    },
+    "evaluationChecks": {
+      "allOf": [
+        { "$ref": "#/$defs/dataReadyChecks" },
+        {
+          "type": "object",
+          "required": ["evaluator_conflict"],
+          "properties": { "evaluator_conflict": { "$ref": "#/$defs/passResult" } }
+        }
+      ]
+    },
+    "payoutChecks": {
+      "allOf": [
+        { "$ref": "#/$defs/collectionChecks" },
+        {
+          "type": "object",
+          "required": ["lineage", "wallet_disclosure"],
+          "properties": {
+            "lineage": { "$ref": "#/$defs/passResult" },
+            "wallet_disclosure": { "$ref": "#/$defs/passResult" }
+          }
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "required": ["meta", "trustGateId", "gate", "subjectRefs", "requestedAction", "purposeRef", "actor", "evaluatedAt", "evidenceVersions", "checks", "decision", "reasonCodes", "expiresAt", "decisionBy"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "trustGateId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "gate": { "enum": ["collect", "accept_data", "train", "fine_tune", "evaluate", "publish", "issue_capability_receipt", "calculate_contribution", "payout"] },
+    "subjectRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "requestedAction": { "type": "string", "pattern": "^[a-z][a-z0-9_]{2,63}$" },
+    "purposeRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "actor": { "$ref": "common.schema.json#/$defs/actorRef" },
+    "artifactType": { "type": "string", "pattern": "^[a-z][a-z0-9_]{2,63}$" },
+    "jurisdictionRefs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "evaluatedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "evidenceVersions": { "$ref": "#/$defs/evidenceSet" },
+    "checks": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "purpose": { "$ref": "#/$defs/checkResult" },
+        "action": { "$ref": "#/$defs/checkResult" },
+        "time": { "$ref": "#/$defs/checkResult" },
+        "territory": { "$ref": "#/$defs/checkResult" },
+        "recipient": { "$ref": "#/$defs/checkResult" },
+        "artifact": { "$ref": "#/$defs/checkResult" },
+        "contributor_rights": { "$ref": "#/$defs/checkResult" },
+        "facility_authority": { "$ref": "#/$defs/checkResult" },
+        "lawful_basis": { "$ref": "#/$defs/checkResult" },
+        "license": { "$ref": "#/$defs/checkResult" },
+        "redaction": { "$ref": "#/$defs/checkResult" },
+        "retention": { "$ref": "#/$defs/checkResult" },
+        "revocation": { "$ref": "#/$defs/checkResult" },
+        "dispute_hold": { "$ref": "#/$defs/checkResult" },
+        "incident_block": { "$ref": "#/$defs/checkResult" },
+        "lineage": { "$ref": "#/$defs/checkResult" },
+        "evaluator_conflict": { "$ref": "#/$defs/checkResult" },
+        "wallet_disclosure": { "$ref": "#/$defs/checkResult" },
+        "safety": { "$ref": "#/$defs/checkResult" }
+      },
+      "additionalProperties": false
+    },
+    "decision": { "enum": ["allow", "deny"] },
+    "reasonCodes": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{2,63}$" }, "uniqueItems": true },
+    "restrictions": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/restriction" } },
+    "expiresAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "decisionBy": { "$ref": "common.schema.json#/$defs/actorRef" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "decision": { "const": "allow" } }, "required": ["decision"] },
+      "then": {
+        "required": ["artifactType", "jurisdictionRefs"],
+        "properties": {
+          "jurisdictionRefs": { "type": "array", "minItems": 1 },
+          "checks": { "$ref": "#/$defs/collectionChecks" },
+          "evidenceVersions": { "$ref": "#/$defs/collectionEvidence" }
+        }
+      }
+    },
+    { "if": { "properties": { "gate": { "const": "collect" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "collect" } } } },
+    { "if": { "properties": { "gate": { "const": "accept_data" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "accept_data" } } } },
+    { "if": { "properties": { "gate": { "const": "train" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "train" } } } },
+    { "if": { "properties": { "gate": { "const": "fine_tune" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "fine_tune" } } } },
+    { "if": { "properties": { "gate": { "const": "evaluate" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "evaluate" } } } },
+    { "if": { "properties": { "gate": { "const": "publish" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "publish" } } } },
+    { "if": { "properties": { "gate": { "const": "issue_capability_receipt" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "issue_capability_receipt" } } } },
+    { "if": { "properties": { "gate": { "const": "calculate_contribution" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "calculate_contribution" } } } },
+    { "if": { "properties": { "gate": { "const": "payout" } }, "required": ["gate"] }, "then": { "properties": { "requestedAction": { "const": "payout" } } } },
+    {
+      "if": { "properties": { "decision": { "const": "allow" }, "gate": { "enum": ["accept_data", "train", "fine_tune"] } }, "required": ["decision", "gate"] },
+      "then": { "properties": { "checks": { "$ref": "#/$defs/dataReadyChecks" }, "evidenceVersions": { "$ref": "#/$defs/dataReadyEvidence" } } }
+    },
+    {
+      "if": { "properties": { "decision": { "const": "allow" }, "gate": { "enum": ["evaluate", "publish", "issue_capability_receipt", "calculate_contribution"] } }, "required": ["decision", "gate"] },
+      "then": { "properties": { "checks": { "$ref": "#/$defs/evaluationChecks" }, "evidenceVersions": { "$ref": "#/$defs/evaluationEvidence" } } }
+    },
+    {
+      "if": { "properties": { "decision": { "const": "allow" }, "gate": { "const": "payout" } }, "required": ["decision", "gate"] },
+      "then": { "properties": { "checks": { "$ref": "#/$defs/payoutChecks" }, "evidenceVersions": { "$ref": "#/$defs/payoutEvidence" } } }
+    }
+  ],
+  "additionalProperties": false
+}

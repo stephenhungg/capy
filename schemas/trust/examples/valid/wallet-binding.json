@@ -1,0 +1,26 @@
+{
+  "targetSchema": "wallet-binding.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "walletBindingId": "wallet_1234567890123456789012",
+    "contributorRef": "person_1234567890123456789012",
+    "network": "solana",
+    "ownerAddress": "7YttLkHDoNj9wyDur5VJVduLh3zEPeU4rki6Vv4ChCkY",
+    "destinationKind": "associated_token_account",
+    "verificationMethod": "offchain_signature",
+    "verificationEvidence": {
+      "evidenceRef": "evidence_1234567890123456789012",
+      "digest": { "algorithm": "sha256", "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" },
+      "accessClass": "highly_restricted"
+    },
+    "verifiedAt": "2026-08-30T11:55:00Z",
+    "effectiveFrom": "2026-08-30T12:00:00Z",
+    "status": "active",
+    "privacyNoticeVersion": "1.0.0",
+    "privacyNoticeDigest": { "algorithm": "sha256", "value": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" },
+    "privacyNoticeAcceptedAt": "2026-08-30T11:50:00Z",
+    "separateWalletGuidanceShown": true,
+    "alternativePayoutRailOffered": true,
+    "accessClass": "highly_restricted"
+  }
+}

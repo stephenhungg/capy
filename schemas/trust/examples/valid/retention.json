@@ -1,0 +1,25 @@
+{
+  "targetSchema": "retention.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "retentionId": "retention_1234567890123456789012",
+    "recordClass": "accepted_raw_capture",
+    "purpose": "retain raw capture until redacted derivative verification",
+    "trigger": "derivative_verified",
+    "triggerAt": "2026-08-30T12:00:00Z",
+    "deleteAt": "2026-11-28T12:00:00Z",
+    "maximumDays": 90,
+    "owner": { "actorRef": "privacy_1234567890123456789012", "role": "privacy_owner" },
+    "jurisdictions": [
+      { "country": "US", "connection": "storage_location", "rulesetVersion": "us-2026-08", "counselStatus": "required" }
+    ],
+    "disposal": {
+      "method": "logical_delete_then_sanitize",
+      "replicasIncluded": true,
+      "cachesIncluded": true,
+      "evidenceRequired": true
+    },
+    "backupPropagationDays": 35,
+    "status": "scheduled"
+  }
+}

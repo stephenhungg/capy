@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/payout.schema.json",
+  "title": "capy restricted Solana USDC payout attempt",
+  "type": "object",
+  "required": ["meta", "payoutAttemptId", "payoutRef", "walletBindingRef", "network", "cluster", "asset", "recipientOwnerAddress", "destinationTokenAccount", "amountBaseUnits", "onchainReference", "onchainReferenceMethod", "onchainReferenceScope", "referenceReused", "memo", "state", "createdAt", "privacyNoticeVersion", "publicReceiptPolicy", "accessClass"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "payoutAttemptId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "payoutRef": { "$ref": "common.schema.json#/$defs/opaqueId", "description": "internal random reference; never placed on-chain" },
+    "walletBindingRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "network": { "const": "solana" },
+    "cluster": { "const": "mainnet-beta" },
+    "asset": {
+      "type": "object",
+      "required": ["symbol", "mint", "decimals", "tokenProgram"],
+      "properties": {
+        "symbol": { "const": "USDC" },
+        "mint": { "const": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" },
+        "decimals": { "const": 6 },
+        "tokenProgram": { "const": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
+      },
+      "additionalProperties": false
+    },
+    "recipientOwnerAddress": { "$ref": "common.schema.json#/$defs/solanaAddress" },
+    "destinationTokenAccount": { "$ref": "common.schema.json#/$defs/solanaAddress" },
+    "amountBaseUnits": { "$ref": "common.schema.json#/$defs/amountBaseUnits" },
+    "onchainReference": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "common.schema.json#/$defs/solanaAddress" }
+      ],
+      "description": "public, per-attempt correlation handle; default null"
+    },
+    "onchainReferenceMethod": { "enum": ["none", "random_32", "hmac_sha256_v1"] },
+    "onchainReferenceScope": { "const": "payout_attempt" },
+    "referenceReused": { "const": false },
+    "memo": { "type": "null", "description": "normal capy profile forbids public memo content" },
+    "providerTransferId": { "type": "string", "minLength": 8, "maxLength": 256 },
+    "transactionSignature": { "$ref": "common.schema.json#/$defs/solanaSignature" },
+    "state": { "enum": ["created", "submitted", "confirmed", "finalized", "failed", "cancelled"] },
+    "createdAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "submittedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "finalizedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "privacyNoticeVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "publicReceiptPolicy": {
+      "type": "object",
+      "required": ["visibility", "directAddressFieldEmbedded", "directAmountFieldEmbedded", "publishExplorerUrl", "separateDisclosureDecision"],
+      "properties": {
+        "visibility": { "enum": ["private_contributor_only", "authorized_auditor", "public_signature_only", "not_published"] },
+        "directAddressFieldEmbedded": { "const": false, "description": "does not imply the address is hidden when a transaction signature is disclosed" },
+        "directAmountFieldEmbedded": { "const": false, "description": "does not imply the amount is hidden when a transaction signature is disclosed" },
+        "publishExplorerUrl": { "const": false },
+        "separateDisclosureDecision": { "type": "boolean" },
+        "derivedChainExposureAcknowledged": { "type": "boolean" },
+        "disclosureEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "visibility": { "const": "public_signature_only" } }, "required": ["visibility"] },
+          "then": {
+            "required": ["derivedChainExposureAcknowledged", "disclosureEvidence"],
+            "properties": {
+              "separateDisclosureDecision": { "const": true },
+              "derivedChainExposureAcknowledged": { "const": true }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "accessClass": { "const": "highly_restricted" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "onchainReferenceMethod": { "const": "none" } }, "required": ["onchainReferenceMethod"] },
+      "then": { "properties": { "onchainReference": { "type": "null" } } },
+      "else": { "properties": { "onchainReference": { "$ref": "common.schema.json#/$defs/solanaAddress" } } }
+    },
+    {
+      "if": { "properties": { "state": { "enum": ["confirmed", "finalized"] } }, "required": ["state"] },
+      "then": { "required": ["providerTransferId", "transactionSignature", "submittedAt"] }
+    },
+    {
+      "if": { "properties": { "state": { "const": "finalized" } }, "required": ["state"] },
+      "then": { "required": ["finalizedAt"] }
+    },
+    {
+      "if": { "properties": { "publicReceiptPolicy": { "type": "object", "properties": { "visibility": { "const": "public_signature_only" } }, "required": ["visibility"] } }, "required": ["publicReceiptPolicy"] },
+      "then": {
+        "required": ["transactionSignature"],
+        "properties": { "state": { "enum": ["confirmed", "finalized"] } }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

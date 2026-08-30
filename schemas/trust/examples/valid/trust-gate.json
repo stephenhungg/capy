@@ -1,0 +1,52 @@
+{
+  "targetSchema": "trust-gate.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T21:00:00Z" },
+    "trustGateId": "gate_8vY4dOlG6wLnH5eF2qAt9S",
+    "gate": "train",
+    "subjectRefs": ["entity_0nQ6vGdY8oDfZ7wX4iSl1K"],
+    "requestedAction": "train",
+    "purposeRef": "purpose_9wZ5ePmH7xMoI6fG3rBu0T",
+    "actor": { "actorRef": "actor_0xA6fQnI8yNpJ7gH4sCv1U", "role": "service" },
+    "artifactType": "cohort_manifest",
+    "jurisdictionRefs": ["jur_2zC8hSpK0aPrL9iJ6uEx3W"],
+    "evaluatedAt": "2026-08-30T21:00:00Z",
+    "evidenceVersions": {
+      "use_policy": { "recordRef": "use_6jM2rCzU4kZbV3sT0eOh7F", "digest": { "algorithm": "sha256", "value": "1111111111111111111111111111111111111111111111111111111111111111" } },
+      "contributor_rights": { "recordRef": "ctr_2fH8mYwQ0gVxR9nP6aKd3B", "digest": { "algorithm": "sha256", "value": "2222222222222222222222222222222222222222222222222222222222222222" } },
+      "facility_permission": { "recordRef": "fac_3aD9iTqL1bQsM0jK7vFy4X", "digest": { "algorithm": "sha256", "value": "3333333333333333333333333333333333333333333333333333333333333333" } },
+      "jurisdiction_assessment": { "recordRef": "jur_2zC8hSpK0aPrL9iJ6uEx3W", "digest": { "algorithm": "sha256", "value": "4444444444444444444444444444444444444444444444444444444444444444" } },
+      "redaction": { "recordRef": "red_4bE0jUrM2cRtN1kL8wGz5Y", "digest": { "algorithm": "sha256", "value": "5555555555555555555555555555555555555555555555555555555555555555" } },
+      "lineage": { "recordRef": "lin_9mP5uFcX7nCeY6vW3hRk0J", "digest": { "algorithm": "sha256", "value": "6666666666666666666666666666666666666666666666666666666666666666" } },
+      "revocation": { "recordRef": "rev_5cF1kVsN3dSuO2lM9xHa6Z", "digest": { "algorithm": "sha256", "value": "7777777777777777777777777777777777777777777777777777777777777777" } },
+      "dispute": { "recordRef": "dsp_6dG2lWtO4eTvP3mN0yIb7A", "digest": { "algorithm": "sha256", "value": "8888888888888888888888888888888888888888888888888888888888888888" } },
+      "retention": { "recordRef": "ret_7kN3sDaV5lAcW4tU1fPi8G", "digest": { "algorithm": "sha256", "value": "9999999999999999999999999999999999999999999999999999999999999999" } },
+      "incident": { "recordRef": "inc_7eH3mXuP5fUwQ4nO1zJc8B", "digest": { "algorithm": "sha256", "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" } },
+      "risk_assessment": { "recordRef": "risk_8fI4nYvQ6gVxR5oP2aKd9C", "digest": { "algorithm": "sha256", "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" } },
+      "license": { "recordRef": "lic_6tW2bMjE4uJlF3cD0oYr7Q", "digest": { "algorithm": "sha256", "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" } }
+    },
+    "checks": {
+      "purpose": { "result": "pass", "reasonCode": "purpose.allowed", "evidenceRef": "use_6jM2rCzU4kZbV3sT0eOh7F" },
+      "action": { "result": "pass", "reasonCode": "action.train_allowed", "evidenceRef": "use_6jM2rCzU4kZbV3sT0eOh7F" },
+      "time": { "result": "pass", "reasonCode": "time.active", "evidenceRef": "use_6jM2rCzU4kZbV3sT0eOh7F" },
+      "territory": { "result": "pass", "reasonCode": "territory.allowed", "evidenceRef": "jur_2zC8hSpK0aPrL9iJ6uEx3W" },
+      "recipient": { "result": "pass", "reasonCode": "recipient.internal", "evidenceRef": "use_6jM2rCzU4kZbV3sT0eOh7F" },
+      "artifact": { "result": "pass", "reasonCode": "artifact.cohort_allowed", "evidenceRef": "use_6jM2rCzU4kZbV3sT0eOh7F" },
+      "contributor_rights": { "result": "pass", "reasonCode": "rights.active", "evidenceRef": "ctr_2fH8mYwQ0gVxR9nP6aKd3B" },
+      "facility_authority": { "result": "pass", "reasonCode": "facility.active", "evidenceRef": "fac_3aD9iTqL1bQsM0jK7vFy4X" },
+      "lawful_basis": { "result": "pass", "reasonCode": "lawful_basis.approved", "evidenceRef": "jur_2zC8hSpK0aPrL9iJ6uEx3W" },
+      "license": { "result": "pass", "reasonCode": "license.training_express", "evidenceRef": "lic_6tW2bMjE4uJlF3cD0oYr7Q" },
+      "redaction": { "result": "pass", "reasonCode": "redaction.verified", "evidenceRef": "red_4bE0jUrM2cRtN1kL8wGz5Y" },
+      "retention": { "result": "pass", "reasonCode": "retention.scheduled", "evidenceRef": "ret_7kN3sDaV5lAcW4tU1fPi8G" },
+      "revocation": { "result": "pass", "reasonCode": "revocation.none", "evidenceRef": "rev_5cF1kVsN3dSuO2lM9xHa6Z" },
+      "dispute_hold": { "result": "pass", "reasonCode": "dispute.none", "evidenceRef": "dsp_6dG2lWtO4eTvP3mN0yIb7A" },
+      "incident_block": { "result": "pass", "reasonCode": "incident.none", "evidenceRef": "inc_7eH3mXuP5fUwQ4nO1zJc8B" },
+      "lineage": { "result": "pass", "reasonCode": "lineage.complete", "evidenceRef": "lin_9mP5uFcX7nCeY6vW3hRk0J" },
+      "safety": { "result": "pass", "reasonCode": "safety.approved", "evidenceRef": "risk_8fI4nYvQ6gVxR5oP2aKd9C" }
+    },
+    "decision": "allow",
+    "reasonCodes": ["all_required_checks_passed"],
+    "expiresAt": "2026-08-31T21:00:00Z",
+    "decisionBy": { "actorRef": "actor_1yB7gRoJ9zOqK8hI5tDw2V", "role": "rights_steward" }
+  }
+}

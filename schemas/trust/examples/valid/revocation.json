@@ -1,0 +1,32 @@
+{
+  "targetSchema": "revocation.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "revocationId": "revocation_1234567890123456789012",
+    "requesterRef": "person_1234567890123456789012",
+    "requestType": "consent_withdrawal",
+    "receivedAt": "2026-08-30T12:00:00Z",
+    "state": "requested",
+    "scope": {
+      "subjectRefs": ["capture_1234567890123456789012"],
+      "actions": ["train", "publish"],
+      "allFutureUse": true,
+      "reason": "contributor withdrew the grant"
+    },
+    "immediateActions": [
+      { "action": "suspend_use", "status": "pending", "targetRefs": ["capture_1234567890123456789012"] }
+    ],
+    "postTrainingImpact": false,
+    "lineageImpact": {
+      "lineageRef": "lineage_1234567890123456789012",
+      "descendantRefs": [],
+      "assessedAt": "2026-08-30T12:05:00Z",
+      "assessedBy": { "actorRef": "steward_1234567890123456789012", "role": "rights_steward" }
+    },
+    "modelActions": [],
+    "jurisdictions": [
+      { "country": "US", "connection": "contributor_location", "rulesetVersion": "us-2026-08", "counselStatus": "required" }
+    ],
+    "owner": { "actorRef": "steward_1234567890123456789012", "role": "rights_steward" }
+  }
+}

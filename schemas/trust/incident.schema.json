@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/incident.schema.json",
+  "title": "capy trust incident record",
+  "type": "object",
+  "required": ["meta", "incidentId", "type", "severity", "detectedAt", "state", "reportedBy", "commander", "affectedRefs", "containment", "jurisdictions", "notificationDecisions", "evidencePreservation", "correctiveActions"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "incidentId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "type": { "enum": ["security_access", "data_disclosure", "rights_gate_bypass", "collection_without_permission", "redaction_failure", "lineage_corruption", "false_provenance", "use_after_revocation", "model_memorization", "evaluator_conflict", "wallet_exposure", "settlement_linkage", "retention_failure", "physical_safety", "privacy_harm", "near_miss"] },
+    "severity": { "enum": ["sev0", "sev1", "sev2", "sev3", "sev4"] },
+    "detectedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "state": { "enum": ["declared", "triaged", "contained", "eradication", "recovery", "monitoring", "closed"] },
+    "reportedBy": { "$ref": "common.schema.json#/$defs/actorRef" },
+    "commander": { "$ref": "common.schema.json#/$defs/actorRef" },
+    "affectedRefs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "lineageRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "containment": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["action", "status", "owner"],
+        "properties": {
+          "action": { "enum": ["revoke_access", "stop_collection", "stop_training", "stop_evaluation", "remove_publication", "break_payout_join", "restrict_model", "isolate_system", "rotate_key", "notify_processor"] },
+          "status": { "enum": ["planned", "in_progress", "completed", "failed"] },
+          "owner": { "$ref": "common.schema.json#/$defs/actorRef" },
+          "completedAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "jurisdictions": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/jurisdiction" } },
+    "notificationDecisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["audience", "required", "decisionAt", "decidedBy", "counselDecisionRef", "basis"],
+        "properties": {
+          "audience": { "enum": ["data_subject", "contributor", "facility", "regulator", "law_enforcement", "insurer", "processor", "customer", "public"] },
+          "required": { "type": "boolean" },
+          "deadlineAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "notifiedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "decisionAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "decidedBy": { "$ref": "common.schema.json#/$defs/actorRef" },
+          "counselDecisionRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "basis": { "type": "string", "minLength": 10, "maxLength": 2000 }
+        },
+        "allOf": [
+          { "if": { "properties": { "required": { "const": true } }, "required": ["required"] }, "then": { "required": ["deadlineAt"] } }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "evidencePreservation": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/evidenceRef" } },
+    "rootCause": { "type": "string", "minLength": 20, "maxLength": 8000 },
+    "recoveryEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" },
+    "correctiveActions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["action", "owner", "dueAt", "status"],
+        "properties": {
+          "action": { "type": "string", "minLength": 5, "maxLength": 2000 },
+          "owner": { "$ref": "common.schema.json#/$defs/actorRef" },
+          "dueAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "status": { "enum": ["planned", "in_progress", "completed", "failed"] },
+          "effectivenessCheckAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "evidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "closedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "postmortemEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "const": "closed" } }, "required": ["state"] },
+      "then": {
+        "required": ["closedAt", "rootCause", "recoveryEvidence", "postmortemEvidence"],
+        "properties": {
+          "containment": {
+            "type": "array",
+            "items": { "type": "object", "properties": { "status": { "const": "completed" } }, "required": ["status"] }
+          },
+          "correctiveActions": {
+            "type": "array",
+            "items": { "type": "object", "properties": { "status": { "const": "completed" } }, "required": ["status"] }
+          },
+          "notificationDecisions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "if": { "properties": { "required": { "const": true } }, "required": ["required"] },
+              "then": { "required": ["notifiedAt"] }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

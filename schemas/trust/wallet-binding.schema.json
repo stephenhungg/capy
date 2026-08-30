@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/wallet-binding.schema.json",
+  "title": "capy restricted wallet binding",
+  "type": "object",
+  "required": ["meta", "walletBindingId", "contributorRef", "network", "ownerAddress", "destinationKind", "verificationMethod", "verifiedAt", "effectiveFrom", "status", "privacyNoticeVersion", "privacyNoticeDigest", "privacyNoticeAcceptedAt", "separateWalletGuidanceShown", "alternativePayoutRailOffered", "accessClass"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "walletBindingId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "contributorRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "network": { "const": "solana" },
+    "ownerAddress": { "$ref": "common.schema.json#/$defs/solanaAddress" },
+    "destinationKind": { "enum": ["associated_token_account", "auxiliary_token_account", "custodial_deposit"] },
+    "verificationMethod": { "enum": ["offchain_signature", "provider_verified", "self_attested"] },
+    "verificationEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" },
+    "verifiedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "effectiveFrom": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "effectiveUntil": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "status": { "enum": ["pending", "active", "replaced", "revoked"] },
+    "privacyNoticeVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "privacyNoticeDigest": { "$ref": "common.schema.json#/$defs/digest" },
+    "privacyNoticeAcceptedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "separateWalletGuidanceShown": { "const": true },
+    "alternativePayoutRailOffered": { "type": "boolean" },
+    "accessClass": { "const": "highly_restricted" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "verificationMethod": { "enum": ["offchain_signature", "provider_verified"] } }, "required": ["verificationMethod"] },
+      "then": { "required": ["verificationEvidence"] }
+    },
+    {
+      "if": { "properties": { "status": { "const": "active" } }, "required": ["status"] },
+      "then": {
+        "required": ["verificationEvidence"],
+        "properties": { "verificationMethod": { "enum": ["offchain_signature", "provider_verified"] } }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

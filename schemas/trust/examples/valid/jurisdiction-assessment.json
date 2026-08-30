@@ -1,0 +1,40 @@
+{
+  "targetSchema": "jurisdiction-assessment.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "jurisdictionAssessmentId": "jurisdiction_1234567890123456789012",
+    "processingRef": "job_1234567890123456789012",
+    "status": "draft",
+    "locations": [
+      { "country": "US", "connection": "collection_location", "rulesetVersion": "us-2026-08", "counselStatus": "required" }
+    ],
+    "roles": [
+      { "actorRef": "controller_1234567890123456789012", "role": "controller", "basis": "determines collection purposes and means" }
+    ],
+    "riskFactors": {
+      "minorOrCapacity": false,
+      "biometricOrUniqueIdentification": false,
+      "workplaceMonitoring": false,
+      "recordingConsent": true,
+      "specialCategoryOrSensitiveData": false,
+      "crossBorderTransfer": false,
+      "sectorRule": false,
+      "exportControl": false,
+      "paymentOrTax": true,
+      "unknownFacts": true
+    },
+    "purposeDecisions": [
+      {
+        "usePolicyRef": "usepolicy_1234567890123456789012",
+        "lawfulBasis": "consent",
+        "transferMechanism": "not_applicable",
+        "decision": "counsel_required",
+        "rightsRequestDeadlineRuleset": "pending-counsel-review",
+        "incidentNotificationRuleset": "pending-counsel-review"
+      }
+    ],
+    "counselReview": { "status": "required" },
+    "effectiveFrom": "2026-08-30T12:00:00Z",
+    "reviewAt": "2026-09-30T12:00:00Z"
+  }
+}

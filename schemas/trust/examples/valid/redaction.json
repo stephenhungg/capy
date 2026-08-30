@@ -1,0 +1,23 @@
+{
+  "targetSchema": "redaction.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T12:00:00Z" },
+    "redactionId": "redaction_1234567890123456789012",
+    "sourceEntityRef": "capture_1234567890123456789012",
+    "state": "clear",
+    "reviewPurpose": "rights_privacy_safety_review",
+    "detectedCategories": [],
+    "transforms": [],
+    "verification": {
+      "method": "human_full",
+      "sampleRate": 1,
+      "acceptanceThreshold": 1,
+      "measuredScore": 1,
+      "passed": true,
+      "verifiedBy": { "actorRef": "reviewer_1234567890123456789012", "role": "privacy_owner" }
+    },
+    "reviewedBy": { "actorRef": "reviewer_1234567890123456789012", "role": "privacy_owner" },
+    "reviewedAt": "2026-08-30T12:00:00Z",
+    "retentionRef": "retention_1234567890123456789012"
+  }
+}

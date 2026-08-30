@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://capy.network/schemas/trust/v1/contributor-rights.schema.json",
+  "title": "capy contributor rights record",
+  "type": "object",
+  "required": ["meta", "contributorRightsId", "contributorRef", "status", "capacity", "notice", "grants", "withdrawalRoute", "jurisdictions", "dataCategories", "sensitiveData", "license", "retentionRef"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/recordMeta" },
+    "contributorRightsId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "contributorRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "status": { "enum": ["draft", "active", "suspended", "withdrawn", "expired", "superseded"] },
+    "capacity": {
+      "type": "object",
+      "required": ["basis", "verified"],
+      "properties": {
+        "basis": { "enum": ["self", "parent", "guardian", "authorized_representative"] },
+        "verified": { "type": "boolean" },
+        "representativeRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "authorityEvidence": { "$ref": "common.schema.json#/$defs/evidenceRef" },
+        "minorOrCapacityConcern": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "basis": { "not": { "const": "self" } } }, "required": ["basis"] },
+          "then": { "required": ["representativeRef", "authorityEvidence"] }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "notice": {
+      "type": "object",
+      "required": ["noticeId", "version", "digest", "language", "presentedAt", "affirmativeAction", "receiptDeliveredAt"],
+      "properties": {
+        "noticeId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "digest": { "$ref": "common.schema.json#/$defs/digest" },
+        "language": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$" },
+        "presentedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "affirmativeAction": { "enum": ["signed", "checked_unbundled_control", "recorded_verbal", "approved_accessible_equivalent"] },
+        "receiptDeliveredAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "evidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+      },
+      "additionalProperties": false
+    },
+    "grants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["grantId", "usePolicyRef", "decision", "grantedAt", "freelyGiven", "compensationDependency", "lawfulBasis"],
+        "properties": {
+          "grantId": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "usePolicyRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+          "decision": { "enum": ["granted", "refused", "withdrawn", "expired"] },
+          "grantedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "validUntil": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "freelyGiven": { "type": "boolean" },
+          "compensationDependency": { "enum": ["none", "necessary_core_collection", "optional_use_separately_compensated"] },
+          "lawfulBasis": { "enum": ["consent", "contract", "legal_obligation", "vital_interests", "public_task", "legitimate_interests", "other_counsel_approved"] },
+          "specialCategoryCondition": { "type": "string", "minLength": 3, "maxLength": 128 },
+          "restrictions": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/restriction" } }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "decision": { "const": "granted" } }, "required": ["decision"] },
+            "then": { "properties": { "freelyGiven": { "const": true } } }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "withdrawalRoute": {
+      "type": "object",
+      "required": ["method", "address", "noDetriment", "asEasyAsGrant"],
+      "properties": {
+        "method": { "enum": ["authenticated_portal", "email", "phone", "postal", "in_person"] },
+        "address": { "type": "string", "minLength": 3, "maxLength": 512 },
+        "noDetriment": { "const": true },
+        "asEasyAsGrant": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "jurisdictions": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/jurisdiction" } },
+    "dataCategories": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["video", "image", "audio", "depth", "lidar", "motion", "telemetry", "network", "robot_state", "environment_map", "interaction", "approximate_location", "precise_location", "device", "identity", "contact", "biometric", "health", "other_sensitive"] } },
+    "sensitiveData": {
+      "type": "object",
+      "required": ["present", "biometricIdentification", "uniqueIdentification"],
+      "properties": {
+        "present": { "type": "boolean" },
+        "biometricIdentification": { "type": "boolean" },
+        "uniqueIdentification": { "type": "boolean" },
+        "riskAssessmentRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+        "counselDecisionRef": { "$ref": "common.schema.json#/$defs/opaqueId" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "biometricIdentification": { "const": true } }, "required": ["biometricIdentification"] },
+          "then": { "required": ["riskAssessmentRef", "counselDecisionRef"] }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "license": {
+      "type": "object",
+      "required": ["rightsStatus", "copyrightAuthority", "publicityLikeness", "trainingAuthorization"],
+      "properties": {
+        "rightsStatus": { "enum": ["owned_by_contributor", "licensed_by_contributor", "assigned", "public_domain", "exception_claimed", "unknown"] },
+        "copyrightAuthority": { "enum": ["verified", "claimed_unverified", "not_applicable", "unknown"] },
+        "spdxExpression": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "customTermsUri": { "type": "string", "format": "uri" },
+        "customTermsDigest": { "$ref": "common.schema.json#/$defs/digest" },
+        "publicityLikeness": { "enum": ["granted", "not_granted", "not_applicable", "counsel_required"] },
+        "trainingAuthorization": { "enum": ["express", "not_granted", "exception_counsel_approved", "unknown"] },
+        "rightsReservationDetected": { "type": "boolean" },
+        "evidence": { "$ref": "common.schema.json#/$defs/evidenceRef" }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["customTermsUri"] },
+          "then": { "required": ["customTermsDigest"] }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "facilityPermissionRefs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/opaqueId" }, "uniqueItems": true },
+    "retentionRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
+    "approvedBy": { "$ref": "common.schema.json#/$defs/actorRef" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "active" } }, "required": ["status"] },
+      "then": {
+        "required": ["approvedBy"],
+        "properties": {
+          "capacity": { "type": "object", "properties": { "verified": { "const": true } }, "required": ["verified"] },
+          "notice": { "type": "object", "required": ["evidence"] }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "capacity": { "type": "object", "properties": { "minorOrCapacityConcern": { "const": true } }, "required": ["minorOrCapacityConcern"] } } },
+      "then": { "properties": { "status": { "not": { "const": "active" } } } }
+    },
+    {
+      "if": {
+        "properties": {
+          "sensitiveData": {
+            "type": "object",
+            "anyOf": [
+              { "properties": { "biometricIdentification": { "const": true } }, "required": ["biometricIdentification"] },
+              { "properties": { "uniqueIdentification": { "const": true } }, "required": ["uniqueIdentification"] }
+            ]
+          }
+        },
+        "required": ["sensitiveData"]
+      },
+      "then": { "properties": { "sensitiveData": { "type": "object", "properties": { "present": { "const": true } }, "required": ["present"] } } }
+    },
+    {
+      "if": { "properties": { "dataCategories": { "type": "array", "contains": { "enum": ["biometric", "health", "other_sensitive"] } } }, "required": ["dataCategories"] },
+      "then": { "properties": { "sensitiveData": { "type": "object", "properties": { "present": { "const": true } }, "required": ["present"] } } }
+    }
+  ],
+  "additionalProperties": false
+}
