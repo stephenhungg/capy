@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0",
+  "sessionId": "i2rt-20260830-run-001",
+  "robotId": "i2rt-001",
+  "capabilityId": "fixed-insertion-v1",
+  "runId": "run-001",
+  "cameraFree": true,
+  "cameraStreams": 0,
+  "startedAt": "2026-08-30T19:00:00.000Z",
+  "endedAt": "2026-08-30T19:01:00.000Z",
+  "eventCount": 42,
+  "artifacts": [
+    {
+      "id": "journal",
+      "name": "events.ndjson",
+      "kind": "journal",
+      "mediaType": "application/x-ndjson",
+      "byteLength": 1234,
+      "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    },
+    {
+      "id": "source-manifest",
+      "name": "manifest.json",
+      "kind": "metadata",
+      "mediaType": "application/json",
+      "byteLength": 512,
+      "sha256": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+    }
+  ],
+  "metadata": {
+    "cell": "lab-a",
+    "controller": "i2rt"
+  }
+}

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { AppShell } from '@/components/app-shell';
 import { WorkItemAction } from '@/components/work-item-action';
 import { getEvidenceMetrics, percent, roleCopy } from '@/lib/capability-view';
+import { probeI2rtIngest } from '@/lib/i2rt-ingest';
 import { CAPABILITY_ID } from '@/lib/protocol-fixtures';
 import {
   getCapabilityBundle,
@@ -17,7 +18,10 @@ export default async function WorkQueue({ searchParams }: { searchParams: Promis
   const requestedLens = (await searchParams).lens;
   const session = await requirePlatformSession(`/app${requestedLens ? `?lens=${requestedLens}` : ''}`);
   const lens = resolveRoleLens(requestedLens, session.membership.role);
-  const bundle = await getCapabilityBundle(CAPABILITY_ID, session.organization.id);
+  const [bundle, i2rtIngest] = await Promise.all([
+    getCapabilityBundle(CAPABILITY_ID, session.organization.id),
+    probeI2rtIngest(),
+  ]);
   if (!bundle) throw new Error('seeded capability is unavailable');
   const metrics = getEvidenceMetrics();
   const copy = roleCopy[lens];
@@ -58,7 +62,7 @@ export default async function WorkQueue({ searchParams }: { searchParams: Promis
             <p className="eyebrow">capability</p>
             <h2 className="mt-1 truncate text-sm font-bold">{bundle.capability.title}</h2>
             <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-[var(--muted-ink)]">
-              <span className="inline-flex items-center gap-1"><Check className="size-3" /> {metrics.episodes} episodes</span>
+              <span className="inline-flex items-center gap-1"><Check className="size-3" /> {i2rtIngest.status ? `i2rt · ${i2rtIngest.status.sessions.verified} ingested · 0 cameras` : `${metrics.episodes} fixture episodes`}</span>
               <span aria-hidden="true">·</span>
               <span>{percent(metrics.candidateSuccess)} evaluation</span>
               <span aria-hidden="true">·</span>

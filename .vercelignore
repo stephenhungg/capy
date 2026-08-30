@@ -1,0 +1,14 @@
+.github
+.gstack
+apps
+docs
+experiments
+packages
+reference
+schemas
+scripts
+services
+tasks
+AGENTS.md
+CLAUDE.md
+README.md

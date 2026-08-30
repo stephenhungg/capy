@@ -1,5 +1,7 @@
 import { env } from 'cloudflare:workers';
 
+import { probeI2rtIngest } from '@/lib/i2rt-ingest';
+
 export type DependencyProbe = {
   state: 'ready' | 'degraded';
   detail: string;
@@ -16,12 +18,13 @@ export type PlatformReadiness = {
     detail: string;
   };
   edgeIngest: {
-    state: 'not_connected';
+    state: 'ready' | 'degraded' | 'not_connected';
     detail: string;
   };
 };
 
 export async function probePlatformReadiness(): Promise<PlatformReadiness> {
+  const edgeIngestPromise = probeI2rtIngest();
   let d1: DependencyProbe;
   let queuedHandoffs = 0;
   try {
@@ -53,6 +56,7 @@ export async function probePlatformReadiness(): Promise<PlatformReadiness> {
   }
 
   const ready = d1.state === 'ready' && r2.state === 'ready';
+  const edgeIngest = await edgeIngestPromise;
   return {
     ready,
     checkedAt: new Date().toISOString(),
@@ -66,9 +70,6 @@ export async function probePlatformReadiness(): Promise<PlatformReadiness> {
           ? 'authorized handoffs await an isolated Solana worker'
           : 'no authorized handoff is waiting',
     },
-    edgeIngest: {
-      state: 'not_connected',
-      detail: 'no physical I2RT edge agent is connected to this deployment',
-    },
+    edgeIngest: { state: edgeIngest.state, detail: edgeIngest.detail },
   };
 }
