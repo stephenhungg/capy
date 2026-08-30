@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
 from math import isfinite
-from typing import Any, Mapping
+from typing import Any
 
 
 class SourceSystem(StrEnum):
@@ -21,6 +22,10 @@ class EvidenceType(StrEnum):
     TRAJECTORY_ERROR = "trajectory_error"
     FIXTURE_STATE = "fixture_state"
     MANUAL_LABEL = "manual_label"
+    INTERVENTION_EVENT = "intervention_event"
+    SAFETY_EVENT = "safety_event"
+    CLOCK_ISSUE = "clock_issue"
+    EPISODE_OUTCOME = "episode_outcome"
 
 
 class ProvenanceKind(StrEnum):
@@ -61,7 +66,7 @@ class TemporalSpan:
         if not self.clock:
             raise ValueError("clock is required")
 
-    def overlaps(self, other: "TemporalSpan") -> bool:
+    def overlaps(self, other: TemporalSpan) -> bool:
         return self.clock == other.clock and self.start_s <= other.end_s and other.start_s <= self.end_s
 
 

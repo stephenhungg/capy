@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any
 
 from .taxonomy import (
     Citation,
@@ -460,9 +461,23 @@ def _failure_type(evidence: EvidenceEnvelope) -> str:
 def build_failure_claims(evidence: Sequence[EvidenceEnvelope]) -> list[FailureClaim]:
     """Build candidate claims and cross-signal corroboration, never confirmation."""
 
-    eligible = [item for item in evidence if item.source_system is SourceSystem.I2RT and item.span is not None]
+    failure_evidence_types = {
+        EvidenceType.MOTOR_CURRENT_EVENT,
+        EvidenceType.TRAJECTORY_ERROR,
+        EvidenceType.FIXTURE_STATE,
+        EvidenceType.MANUAL_LABEL,
+    }
+    eligible = [
+        item
+        for item in evidence
+        if item.source_system is SourceSystem.I2RT
+        and item.evidence_type in failure_evidence_types
+        and item.span is not None
+    ]
     claims: list[FailureClaim] = []
     for item in eligible:
+        item_span = item.span
+        assert item_span is not None
         limitations = {
             EvidenceType.MOTOR_CURRENT_EVENT: (
                 "high current can reflect intended contact or load; it does not identify root cause",
@@ -484,7 +499,7 @@ def build_failure_claims(evidence: Sequence[EvidenceEnvelope]) -> list[FailureCl
                 failure_type=_failure_type(item),
                 task_id=item.task_id,
                 phase=item.phase,
-                span=item.span,
+                span=item_span,
                 status=ClaimStatus.CANDIDATE,
                 evidence_ids=(item.evidence_id,),
                 rationale=item.claim,
@@ -499,16 +514,19 @@ def build_failure_claims(evidence: Sequence[EvidenceEnvelope]) -> list[FailureCl
     }
     for index, left in enumerate(eligible):
         for right in eligible[index + 1 :]:
+            left_span = left.span
+            right_span = right.span
+            assert left_span is not None and right_span is not None
             if (
                 left.task_id != right.task_id
                 or left.payload.get("run_id") != right.payload.get("run_id")
                 or left.evidence_type == right.evidence_type
                 or left.evidence_type not in machine_types
                 or right.evidence_type not in machine_types
-                or not left.span.overlaps(right.span)
+                or not left_span.overlaps(right_span)
             ):
                 continue
-            start, end = min(left.span.start_s, right.span.start_s), max(left.span.end_s, right.span.end_s)
+            start, end = min(left_span.start_s, right_span.start_s), max(left_span.end_s, right_span.end_s)
             evidence_ids = tuple(sorted((left.evidence_id, right.evidence_id)))
             identity = {"type": "multi_signal_execution_anomaly", "evidence": evidence_ids}
             claims.append(
@@ -517,7 +535,7 @@ def build_failure_claims(evidence: Sequence[EvidenceEnvelope]) -> list[FailureCl
                     failure_type="multi_signal_execution_anomaly",
                     task_id=left.task_id,
                     phase=left.phase if left.phase == right.phase else TemporalPhase.UNKNOWN,
-                    span=TemporalSpan(start, end, left.span.clock),
+                    span=TemporalSpan(start, end, left_span.clock),
                     status=ClaimStatus.CORROBORATED,
                     evidence_ids=evidence_ids,
                     rationale="two different instrumented signals overlap in time",

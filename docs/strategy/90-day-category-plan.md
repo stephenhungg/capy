@@ -103,7 +103,7 @@ at maturity, a capability contract may admit an experience cohort, recovery poli
 - MCAP logs and normalized robot datasets;
 - real-hardware evaluation as a service;
 - provenance and licensing metadata;
-- stablecoin transfers and transaction memos;
+- stablecoin transfers and public transaction metadata;
 - a public marketplace, contributor reputation, or “data flywheel” language.
 
 ### the uncomfortable truth
@@ -217,7 +217,7 @@ v0 uses standard token transfers of Circle-issued native USDC:
 - no capy token, points-to-token promise, bridged USDC, custom mint, or custom Solana program;
 - capy sponsors transaction fees so contributors do not need SOL;
 - payout rows use application-level idempotency before submission;
-- opaque memo/reference data supports reconciliation without exposing capability details;
+- opaque off-chain references support reconciliation without exposing capability details on-chain;
 - every row persists submitted, confirmed, finalized, or failed status and transaction signature;
 - treasury approval, sanctions/tax/KYC decisions, disputes, and attribution stay offchain;
 - public wallet/amount linkage is disclosed to contributors before wallet enrollment.

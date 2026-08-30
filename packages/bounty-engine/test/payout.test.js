@@ -28,6 +28,7 @@ function fixture() {
     },
     contributions: [
       {
+        allocationId: "allocation-a",
         contributionId: "contribution-a",
         contributorId: "contributor-a",
         payoutAddress: ADDRESS_A,
@@ -39,6 +40,7 @@ function fixture() {
         reuseCreditBps: 10000,
       },
       {
+        allocationId: "allocation-b",
         contributionId: "contribution-b",
         contributorId: "contributor-b",
         payoutAddress: ADDRESS_B,
@@ -50,6 +52,7 @@ function fixture() {
         reuseCreditBps: 0,
       },
       {
+        allocationId: "allocation-c",
         contributionId: "contribution-c",
         contributorId: "contributor-c",
         payoutAddress: ADDRESS_C,
@@ -153,6 +156,94 @@ test("duplicate content cannot enter payout under different contributor ids", ()
   assert.throws(() => calculatePayoutManifest(input), /duplicate content hash/);
 });
 
+test("every contribution requires an attribution allocation id", () => {
+  const input = fixture();
+  delete input.contributions[0].allocationId;
+  assert.throws(() => calculatePayoutManifest(input), /contribution\.allocationId must be a non-empty string/);
+});
+
+test("shared wallets preserve one transfer per attribution allocation", () => {
+  const input = fixture();
+  input.contributions[1].payoutAddress = input.contributions[0].payoutAddress;
+  const manifest = calculatePayoutManifest(input);
+
+  const sharedWalletTransfers = manifest.transfers.filter(
+    (transfer) => transfer.recipientOwner === input.contributions[0].payoutAddress,
+  );
+  assert.equal(sharedWalletTransfers.length, 2);
+  assert.deepEqual(
+    sharedWalletTransfers.map((transfer) => transfer.allocationId),
+    ["allocation-a", "allocation-b"],
+  );
+  assert.notEqual(sharedWalletTransfers[0].transferId, sharedWalletTransfers[1].transferId);
+});
+
+test("compatible contributions in one attribution allocation group into one transfer", () => {
+  const input = fixture();
+  input.contributions.push({
+    ...input.contributions[0],
+    contributionId: "contribution-a-continued",
+    contentHash: "sha256:episode-a-continued",
+    acceptedUnits: 1,
+  });
+  const manifest = calculatePayoutManifest(input);
+  const reordered = calculatePayoutManifest({ ...input, contributions: [...input.contributions].reverse() });
+  const transfer = manifest.transfers.find((candidate) => candidate.allocationId === "allocation-a");
+
+  assert.equal(manifest.manifestId, reordered.manifestId);
+  assert.equal(manifest.canonicalJson, reordered.canonicalJson);
+  assert.ok(transfer);
+  assert.equal(manifest.transfers.filter((candidate) => candidate.allocationId === "allocation-a").length, 1);
+  assert.deepEqual(
+    [...new Set(transfer.lineItems.map((item) => item.contributionId))].sort(),
+    ["contribution-a", "contribution-a-continued"],
+  );
+  assert.equal(transfer.contributorId, "contributor-a");
+  assert.equal(transfer.cohortId, "cohort-01");
+});
+
+test("an attribution allocation cannot cross contributor, cohort, or wallet identities", () => {
+  for (const [field, value] of [
+    ["contributorId", "different-contributor"],
+    ["cohortId", "cohort-02"],
+    ["payoutAddress", ADDRESS_B],
+  ]) {
+    const input = fixture();
+    input.contributions.push({
+      ...input.contributions[0],
+      contributionId: `contribution-mismatch-${field}`,
+      contentHash: `sha256:episode-mismatch-${field}`,
+      [field]: value,
+    });
+
+    assert.throws(
+      () => calculatePayoutManifest(input),
+      /allocation allocation-a must use one contributor, cohort, and payout address/,
+      field,
+    );
+  }
+});
+
+test("allocation-aware transfer grouping conserves every paid and withheld atom", () => {
+  const input = fixture();
+  input.contributions[1].payoutAddress = input.contributions[0].payoutAddress;
+  input.contributions.push({
+    ...input.contributions[0],
+    contributionId: "contribution-a-continued",
+    contentHash: "sha256:episode-a-continued",
+    acceptedUnits: 3,
+  });
+  const manifest = calculatePayoutManifest(input);
+  const paid = manifest.transfers.reduce((sum, transfer) => sum + BigInt(transfer.amountAtomic), 0n);
+  const lineItems = manifest.transfers
+    .flatMap((transfer) => transfer.lineItems)
+    .reduce((sum, lineItem) => sum + BigInt(lineItem.amountAtomic), 0n);
+
+  assert.equal(paid, BigInt(manifest.calculation.paidAtomic));
+  assert.equal(lineItems, paid);
+  assert.equal(paid + BigInt(manifest.calculation.withheldAtomic), BigInt(manifest.calculation.totalAtomic));
+});
+
 test("manifest schema is versioned and covers the emitted top-level contract", async () => {
   const schema = JSON.parse(
     await readFile(new URL("../schema/payout-manifest.schema.json", import.meta.url), "utf8"),
@@ -162,4 +253,8 @@ test("manifest schema is versioned and covers the emitted top-level contract", a
   assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema");
   assert.equal(manifest.schemaVersion, schema.properties.schemaVersion.const);
   for (const property of schema.required) assert.ok(Object.hasOwn(manifest, property), property);
+  const transferSchema = schema.properties.transfers.items;
+  for (const transfer of manifest.transfers) {
+    for (const property of transferSchema.required) assert.ok(Object.hasOwn(transfer, property), property);
+  }
 });

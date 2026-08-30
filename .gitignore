@@ -3,9 +3,14 @@ node_modules/
 *.tsbuildinfo
 .DS_Store
 *.log
+__pycache__/
+*.py[cod]
+**/.capy-payout-state/
 .gstack/
 .openai/
 !.openai/hosting.json
+!apps/web/.openai/
+!apps/web/.openai/hosting.json
 dist/
 coverage/
 .env

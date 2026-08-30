@@ -9,7 +9,7 @@
     "attribution_result": {
       "object_id": "urn:uuid:44444444-4444-4444-8444-444444444444",
       "object_type": "attribution_result",
-      "object_digest": "sha256:73285bc2bcf854dfdb709eefce073cdb852e4cf7e1a7163c9a1ed4e4ffcd9df4"
+      "object_digest": "sha256:f272b00c2bac0f0113ba690f356428a0152f749a0f42436af813c656d003604e"
     },
     "payout_authority": {
       "actor_id": "urn:capy:actor:payout-service",
@@ -37,7 +37,7 @@
         "allocation_id": "alloc-operator-17",
         "contributor_id": "urn:capy:contributor:operator-17",
         "recipient_owner": "AUXZDPZgr39SrGx4vGZ22vhUMgdUpc8ULKATNNfkGfYi",
-        "recipient_token_account": "4e3VyM4BJRJL4TpBUom2JCX9U5oj7e35kFTRJwGvA44m",
+        "recipient_token_account": "HR6eJNAedAEqQGRUaG7xjZAfAYDZXKRRQWfXP8Csp7CU",
         "amount_base_units": "75000000"
       },
       {
@@ -45,7 +45,7 @@
         "allocation_id": "alloc-fixture-lab",
         "contributor_id": "urn:capy:contributor:fixture-lab",
         "recipient_owner": "HbZ5WraUieFH56yrHxKwxaz2W67p6TmsDCF2uR8yihBx",
-        "recipient_token_account": "HWUmobLyGLRdmK1ugcWBVz5HJY4ZYxhxscZxwJJgLyLH",
+        "recipient_token_account": "7C9r7LJZnGBb1EQdkhnh2ad6Fw5C81Yf21uUXEoDMJHL",
         "amount_base_units": "25000000"
       }
     ],
@@ -61,8 +61,7 @@
           "transfer-fixture-lab"
         ],
         "instruction": "TransferChecked",
-        "memo_program": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
-        "memo": "capy:payout:urn:uuid:55555555-5555-4555-8555-555555555555"
+        "memo": null
       }
     ],
     "execution_policy": {
@@ -81,7 +80,6 @@
       "onchain_fields": [
         "wallet_addresses",
         "token_amounts",
-        "manifest_object_id",
         "transaction_signatures"
       ]
     }
@@ -90,13 +88,13 @@
     "canonicalization": "RFC8785",
     "hash_algorithm": "sha-256",
     "digest_scope": "object-without-integrity-or-signatures",
-    "object_digest": "sha256:15cf38fbf7ad39e1eb13f114c51c330c8bbca22fa92119a5b373433df92ee886"
+    "object_digest": "sha256:145e50e26302070ad413a5a7813aaf22527298ee275bf9cca188a23fe9c08f98"
   },
   "signatures": [
     {
       "algorithm": "Ed25519",
       "key_id": "urn:capy:key:payout-service-2026-01",
-      "signed_digest": "sha256:15cf38fbf7ad39e1eb13f114c51c330c8bbca22fa92119a5b373433df92ee886",
+      "signed_digest": "sha256:145e50e26302070ad413a5a7813aaf22527298ee275bf9cca188a23fe9c08f98",
       "signature_base64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "created_at": "2026-09-05T22:00:01Z"
     }

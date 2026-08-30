@@ -55,6 +55,19 @@ the i2rt adapter requires `camera_present: false`; true or unknown status is rej
 
 all i2rt evidence retains a shared run id, task id, monotonic-relative time span, source telemetry uri, rule version, and phase. correlation is permitted only inside one run and one clock.
 
+### canonical i2rt source journal
+
+`adapt_i2rt_journal` consumes the recorder's actual `manifest.json` plus canonical `events.ndjson`, not the older bridge-only `samples` fixture. it computes sha-256 digests over both source files and emits two bounded projections:
+
+- an `I2RTEpisodeProjection` for every completed episode, containing the exact session/episode ids, free-text recorder instruction, separately supplied protocol task id, fixed geometry id, event and frame ranges, manual terminal outcome, capture-quality counts, intervention/safety/clock counts, and source-journal lineage;
+- `EvidenceEnvelope` rows for intervention transitions, safety transitions, derived clock issues, and the manual terminal outcome. each row cites the source journal and exact event sequence without copying high-rate frame arrays.
+
+the protocol task binding is required as `task_ids_by_episode`. the adapter never turns the recorder's free-text instruction into a protocol task id. the phase binding is optional and defaults to `unknown` rather than being inferred.
+
+the boundary validator rejects non-contiguous event sequences, monotonic-time regression, unknown events, camera-bearing fields, frames or annotations outside an active episode, inconsistent active intervention/safety sets, missing frames, incomplete episodes, malformed manual outcomes, and missing or incomplete session termination. a journal with `session_end.incomplete_episode_id` set is recoverable recorder data, but it is not eligible for this completed-episode projection.
+
+the journal projection also supplies the protocol episode count, successful-episode count, ordered episode-id digest, observed `/capy/*` topics, and the exact `source_journal` object used by the episode-cohort raw-recording entry. it intentionally does not claim that an MCAP has been indexed or crc-verified; those facts must come from the MCAP ingest/export verifier.
+
 ## how signals become failure evidence
 
 | input | emitted evidence | candidate interpretation | what it does not prove |
@@ -93,6 +106,8 @@ the package output is intended to sit below this future receipt shape:
 
 raw synchronized robot logs should remain in MCAP, with bridge records pointing to bounded spans rather than copying high-rate arrays. a later LeRobot adapter can reference normalized training episodes through the same evidence envelope. neither format is reimplemented here.
 
+the direct-journal path is intentionally separate from `adapt_i2rt_telemetry`. the older telemetry adapter remains useful for configured threshold rules over an already normalized sample view; the journal adapter preserves recorder truth and lifecycle provenance before those optional rules run.
+
 ## verification
 
 the package uses only the python standard library. run its representative contract tests from the capy repository root:
@@ -103,7 +118,7 @@ PYTHONPATH=packages/evidence-bridge/src python3 -m unittest discover -s packages
 
 ## limitations and next work
 
-- the package consumes representative JSON mappings; it is not an MCAP reader, vima service client, or world context SDK integration;
+- the world context, vima, and threshold-rule adapters consume representative JSON mappings; the direct i2rt adapter reads the canonical recorder journal but is not an MCAP reader;
 - the world context fixture is research-plan-derived and does not enumerate the full 50-label release ontology;
 - thresholds are hand-configured and have no learned baseline, temperature compensation, hysteresis, or uncertainty model;
 - fixture state evaluation uses the freshest channel-specific sample inside a declared window and suppresses missing or stale observations; it does not diagnose sensor health;

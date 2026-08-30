@@ -46,12 +46,44 @@ export interface ValidatedPayout {
   readonly amountBaseUnits: bigint;
 }
 
+export interface RailManifestAuthorizationBinding {
+  readonly source: "rail-manifest";
+  readonly objectId: string;
+  readonly digest: `sha256:${string}`;
+}
+
+export interface ProtocolAuthorizedTransfer {
+  readonly payoutId: string;
+  readonly transferId: string;
+  readonly allocationId: string;
+  readonly contributorId: string;
+  readonly recipientWallet: Address;
+  readonly recipientTokenAccount: Address;
+  readonly amountBaseUnits: bigint;
+}
+
+export interface ProtocolPayoutAuthorizationBinding {
+  readonly source: "protocol-payout-manifest";
+  readonly objectId: string;
+  readonly digest: `sha256:${string}`;
+  readonly attributionObjectId: string;
+  readonly attributionDigest: `sha256:${string}`;
+  readonly treasuryAuthority: Address;
+  readonly sourceTokenAccount: Address;
+  readonly transfers: readonly ProtocolAuthorizedTransfer[];
+}
+
+export type PayoutAuthorizationBinding =
+  | RailManifestAuthorizationBinding
+  | ProtocolPayoutAuthorizationBinding;
+
 export interface ValidatedManifest {
   readonly manifest: PayoutManifestV1;
   readonly mint: Address;
   readonly payouts: readonly ValidatedPayout[];
   readonly totalBaseUnits: bigint;
   readonly manifestHash: string;
+  readonly authorization: PayoutAuthorizationBinding;
 }
 
 export function validateManifest(input: unknown): ValidatedManifest {
@@ -108,5 +140,16 @@ export function validateManifest(input: unknown): ValidatedManifest {
 
   const canonical = JSON.stringify(manifest);
   const manifestHash = createHash("sha256").update(canonical).digest("hex");
-  return { manifest, mint, payouts, totalBaseUnits, manifestHash };
+  return {
+    manifest,
+    mint,
+    payouts,
+    totalBaseUnits,
+    manifestHash,
+    authorization: {
+      source: "rail-manifest",
+      objectId: `urn:capy:rail-payout-manifest:${manifest.manifest_id}`,
+      digest: `sha256:${manifestHash}`
+    }
+  };
 }

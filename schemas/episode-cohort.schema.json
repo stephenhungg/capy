@@ -126,25 +126,66 @@
         "artifact",
         "container",
         "container_major_version",
+        "profile",
+        "producer",
         "message_encoding",
-        "ros_distribution",
+        "schema_encoding",
         "topics_digest",
         "clock_basis",
         "indexed",
-        "crc_verified"
+        "crc_verified",
+        "source_journal"
       ],
       "properties": {
         "recording_id": {"type": "string", "minLength": 1, "maxLength": 128},
         "artifact": {"$ref": "common.schema.json#/$defs/artifactReference"},
         "container": {"const": "MCAP"},
         "container_major_version": {"const": "0"},
+        "profile": {"enum": ["ros2.mcap.v1", "capy.i2rt.camera_free.v1"]},
+        "producer": {"$ref": "#/$defs/mcapProducer"},
         "message_encoding": {"enum": ["cdr", "protobuf", "json"]},
-        "ros_distribution": {"type": "string", "minLength": 1, "maxLength": 64},
+        "schema_encoding": {"enum": ["ros2msg", "protobuf", "jsonschema"]},
         "topics_digest": {"$ref": "common.schema.json#/$defs/sha256Digest"},
         "clock_basis": {"enum": ["system_time", "ros_time"]},
         "indexed": {"const": true},
-        "crc_verified": {"const": true}
+        "crc_verified": {"const": true},
+        "source_journal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["format", "manifest_digest", "events_digest"],
+          "properties": {
+            "format": {"const": "capy.ndjson.camera_free.v1"},
+            "manifest_digest": {"$ref": "common.schema.json#/$defs/sha256Digest"},
+            "events_digest": {"$ref": "common.schema.json#/$defs/sha256Digest"}
+          }
+        }
       }
+    },
+    "mcapProducer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "name", "version", "source_revision"],
+          "properties": {
+            "kind": {"const": "ros2"},
+            "name": {"const": "rosbag2_storage_mcap"},
+            "version": {"type": "string", "minLength": 1, "maxLength": 64},
+            "source_revision": {"type": "string", "minLength": 1, "maxLength": 128}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "name", "version", "source_revision"],
+          "properties": {
+            "kind": {"const": "direct_i2rt"},
+            "name": {"const": "capy_i2rt_recorder"},
+            "version": {"type": "string", "minLength": 1, "maxLength": 64},
+            "source_revision": {"type": "string", "minLength": 1, "maxLength": 128}
+          }
+        }
+      ]
     },
     "normalizedDataset": {
       "type": "object",

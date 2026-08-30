@@ -9,7 +9,7 @@
     "capability": {
       "object_id": "urn:uuid:11111111-1111-4111-8111-111111111111",
       "object_type": "capability_manifest",
-      "object_digest": "sha256:857c5ae16e45c538e39288d06a0e5476d23d7ce03c846b3403e02a48ea80856e"
+      "object_digest": "sha256:49b5c0b6f0020dd8460850d5aed320d1e04ccf0543506818a7e3c84b9de69e2c"
     },
     "collection_job_id": "urn:capy:collection-job:yam-button-2026-09-01",
     "collector": {
@@ -87,12 +87,24 @@
         },
         "container": "MCAP",
         "container_major_version": "0",
-        "message_encoding": "cdr",
-        "ros_distribution": "Jazzy",
+        "profile": "capy.i2rt.camera_free.v1",
+        "producer": {
+          "kind": "direct_i2rt",
+          "name": "capy_i2rt_recorder",
+          "version": "0.1.0",
+          "source_revision": "47fee5e7dec4e30ca054f798bda1c8894b465ed2"
+        },
+        "message_encoding": "json",
+        "schema_encoding": "jsonschema",
         "topics_digest": "sha256:cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
         "clock_basis": "system_time",
         "indexed": true,
-        "crc_verified": true
+        "crc_verified": true,
+        "source_journal": {
+          "format": "capy.ndjson.camera_free.v1",
+          "manifest_digest": "sha256:bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc",
+          "events_digest": "sha256:acacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacac"
+        }
       }
     ],
     "normalized_dataset": {
@@ -144,29 +156,23 @@
           ]
         },
         {
-          "key": "observation.task.target_pose",
-          "dtype": "float32",
-          "shape": [
-            7
-          ],
-          "names": [
-            "x",
-            "y",
-            "z",
-            "qx",
-            "qy",
-            "qz",
-            "qw"
-          ]
-        },
-        {
-          "key": "observation.fixture.switch",
+          "key": "observation.intervention_active",
           "dtype": "bool",
           "shape": [
             1
           ],
           "names": [
-            "pressed"
+            "active"
+          ]
+        },
+        {
+          "key": "observation.safety_active",
+          "dtype": "bool",
+          "shape": [
+            1
+          ],
+          "names": [
+            "active"
           ]
         },
         {
@@ -405,13 +411,13 @@
     "canonicalization": "RFC8785",
     "hash_algorithm": "sha-256",
     "digest_scope": "object-without-integrity-or-signatures",
-    "object_digest": "sha256:8c730dc05861f9c80beda42585517cabd72cfa921bcc90557061d0b7f765327c"
+    "object_digest": "sha256:8a75aa78db4cb66566e298268a44a67677b96ae0245e0635bde17aea3c5ab45c"
   },
   "signatures": [
     {
       "algorithm": "Ed25519",
       "key_id": "urn:capy:key:collection-lab-2026-01",
-      "signed_digest": "sha256:8c730dc05861f9c80beda42585517cabd72cfa921bcc90557061d0b7f765327c",
+      "signed_digest": "sha256:8a75aa78db4cb66566e298268a44a67677b96ae0245e0635bde17aea3c5ab45c",
       "signature_base64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "created_at": "2026-09-02T22:15:01Z"
     }

@@ -26,9 +26,27 @@ def test_mcap_and_lerobot_exports_are_deterministic(tmp_path: Path) -> None:
     second_mcap = export_mcap(recording, tmp_path / "second.mcap")
     assert first_mcap.read_bytes() == second_mcap.read_bytes()
     with first_mcap.open("rb") as stream:
-        messages = list(make_reader(stream).iter_messages())
+        reader = make_reader(stream)
+        header = reader.get_header()
+        summary = reader.get_summary()
+        metadata = {record.name: record.metadata for record in reader.iter_metadata()}
+        messages = list(reader.iter_messages())
+    assert header.profile == "capy.i2rt.camera_free.v1"
+    assert header.library == "capy-i2rt-recorder/0.1.0"
+    assert summary is not None
+    assert summary.statistics is not None
+    assert summary.metadata_indexes
+    assert all(schema.encoding == "jsonschema" for schema in summary.schemas.values())
+    assert all(channel.message_encoding == "json" for channel in summary.channels.values())
+    assert metadata["capy_source_journal"] == {
+        "format": "capy.ndjson.camera_free.v1",
+        "manifest_digest": f"sha256:{hashlib.sha256((recording / 'manifest.json').read_bytes()).hexdigest()}",
+        "events_digest": f"sha256:{hashlib.sha256((recording / 'events.ndjson').read_bytes()).hexdigest()}",
+    }
     assert len(messages) == 13
-    assert {channel.topic for _schema, channel, _message in messages} >= {
+    assert {channel.topic for channel in summary.channels.values()} == {
+        "/capy/session_start",
+        "/capy/session_end",
         "/capy/frame",
         "/capy/episode_start",
         "/capy/episode_end",

@@ -107,6 +107,8 @@ program
       valid: true,
       manifest_id: manifest.manifest.manifest_id,
       manifest_hash: manifest.manifestHash,
+      authorization_object_id: manifest.authorization.objectId,
+      authorization_digest: manifest.authorization.digest,
       network: manifest.manifest.network,
       mint: manifest.mint,
       payout_count: manifest.payouts.length,
@@ -215,6 +217,8 @@ reconcile.action(async (manifestPath: string, options: CommonOptions) => {
   assertStateIdentity(existing, {
     manifestId: manifest.manifest.manifest_id,
     manifestHash: manifest.manifestHash,
+    authorizationObjectId: manifest.authorization.objectId,
+    authorizationDigest: manifest.authorization.digest,
     planHash: existing.plan_hash,
     network: manifest.manifest.network,
     mint: manifest.mint,

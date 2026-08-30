@@ -167,6 +167,14 @@ assert(capability.payload.interfaces.normalized_training.visual_features_allowed
 assert(capability.payload.collection_requirements.prohibited_modalities.includes("camera"), "camera-free capability does not prohibit cameras");
 assert(cohort.payload.normalized_dataset.use_videos === false, "camera-free cohort enables video");
 assert(cohort.payload.privacy.camera_free === true, "camera-free cohort privacy flag is false");
+assert(capability.payload.interfaces.middleware.kind === "direct_i2rt", "camera-free capability does not declare the direct I2RT interface");
+assert(capability.payload.interfaces.raw_evidence.profile === "capy.i2rt.camera_free.v1", "capability names the wrong MCAP profile");
+assert(cohort.payload.raw_recordings.every((recording) => recording.profile === capability.payload.interfaces.raw_evidence.profile), "cohort MCAP profile differs from capability");
+assert(cohort.payload.raw_recordings.every((recording) => recording.message_encoding === capability.payload.interfaces.raw_evidence.message_encoding), "cohort MCAP encoding differs from capability");
+assert(cohort.payload.raw_recordings.every((recording) => recording.producer.name === capability.payload.interfaces.raw_evidence.producer.name), "cohort MCAP producer differs from capability");
+const requiredDirectChannels = new Set(["/capy/session_start", "/capy/session_end", "/capy/episode_start", "/capy/frame", "/capy/intervention", "/capy/safety_event", "/capy/clock_issue", "/capy/episode_end"]);
+const declaredDirectChannels = new Set(capability.payload.interfaces.raw_evidence.channels.filter((channel) => channel.required).map((channel) => channel.topic));
+assert([...requiredDirectChannels].every((channel) => declaredDirectChannels.has(channel)), "camera-free capability omits a required direct I2RT channel");
 assert(
   !cohort.payload.normalized_dataset.features.some((feature) => feature.dtype === "image" || feature.dtype === "video" || feature.key.startsWith("observation.images.")),
   "camera-free cohort contains a visual feature"

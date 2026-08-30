@@ -68,6 +68,8 @@ function identity(plan: PayoutPlan): StateIdentity {
   return {
     manifestId: plan.manifest.manifest.manifest_id,
     manifestHash: plan.manifest.manifestHash,
+    authorizationObjectId: plan.manifest.authorization.objectId,
+    authorizationDigest: plan.manifest.authorization.digest,
     planHash: getPlanHash(plan),
     network: plan.manifest.manifest.network,
     mint: plan.manifest.mint,

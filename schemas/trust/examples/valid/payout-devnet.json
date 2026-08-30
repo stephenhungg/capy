@@ -1,0 +1,36 @@
+{
+  "targetSchema": "payout.schema.json",
+  "instance": {
+    "meta": { "schemaVersion": "1.0.0", "recordedAt": "2026-08-30T20:00:00Z" },
+    "payoutAttemptId": "pay_8vY4dOlG6wLnH5eF2qAt9S",
+    "payoutRef": "pref_9wZ5ePmH7xMoI6fG3rBu0T",
+    "walletBindingRef": "wallet_0xA6fQnI8yNpJ7gH4sCv1U",
+    "network": "solana",
+    "cluster": "devnet",
+    "asset": {
+      "symbol": "USDC",
+      "mint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "decimals": 6,
+      "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+    },
+    "recipientOwnerAddress": "8ctqXwZioqieiYseCAyAfMrki4g9KkC9bHMyn7sRAhhq",
+    "destinationTokenAccount": "DBXsB968aek8c3d66guKzVwPrsz1EugAfric3m6z1q2t",
+    "amountBaseUnits": "1500000",
+    "onchainReference": null,
+    "onchainReferenceMethod": "none",
+    "onchainReferenceScope": "payout_attempt",
+    "referenceReused": false,
+    "memo": null,
+    "state": "created",
+    "createdAt": "2026-08-30T20:00:00Z",
+    "privacyNoticeVersion": "1.0.0",
+    "publicReceiptPolicy": {
+      "visibility": "private_contributor_only",
+      "directAddressFieldEmbedded": false,
+      "directAmountFieldEmbedded": false,
+      "publishExplorerUrl": false,
+      "separateDisclosureDecision": false
+    },
+    "accessClass": "highly_restricted"
+  }
+}

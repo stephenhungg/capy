@@ -8,7 +8,7 @@
           -0.012500000000000011,
           0.23750000000000004
         ],
-        "mean_marginal_gain": 0.112846875,
+        "mean_marginal_gain": 0.11284687499999987,
         "probability_ranked_first": 0.04833333333333333
       },
       "targeted": {
@@ -16,7 +16,7 @@
           0.11875000000000002,
           0.34374999999999994
         ],
-        "mean_marginal_gain": 0.2312625,
+        "mean_marginal_gain": 0.2312625000000005,
         "probability_ranked_first": 0.9516666666666667
       }
     },
@@ -96,7 +96,7 @@
     {
       "action_on_failure": "kill bounty-compiler claim; sell data/evaluation tooling only",
       "evidence": {
-        "first_task_ratio": 2.0555555555555562,
+        "first_task_ratio": 2.055555555555547,
         "first_task_signal": "provisional_pass",
         "reason": "criterion requires three tasks; this report contains one",
         "tasks_completed": 1,
@@ -357,28 +357,28 @@
     "baseline_success_rate": 0.4625,
     "bootstrap_replicates_requested": 2000,
     "bootstrap_unit": "failure-mode-stratified held-out scenario block",
-    "gain_per_dollar_threshold_contrast": 6.865530303030305e-05,
+    "gain_per_dollar_threshold_contrast": 6.865530303030255e-05,
     "gain_per_dollar_threshold_contrast_95": [
-      1.6177398989898986e-05,
-      0.00012389520202020195
+      1.6177398989898975e-05,
+      0.00012389520202020173
     ],
     "probability_threshold_contrast_positive": 0.9945,
-    "random_absolute_gain": 0.11249999999999993,
+    "random_absolute_gain": 0.11250000000000038,
     "random_gain_95": [
-      0.016666666666666607,
-      0.20208333333333334
+      0.01666666666666705,
+      0.2020833333333339
     ],
-    "random_gain_nonpositive_bootstrap_fraction": 0.009,
-    "random_gain_per_dollar": 8.522727272727268e-05,
+    "random_gain_nonpositive_bootstrap_fraction": 0.0085,
+    "random_gain_per_dollar": 8.522727272727302e-05,
     "ratio_95": null,
     "ratio_interval_reason": "not reported: ratios are singular when bootstrap random gain approaches or crosses zero",
-    "targeted_absolute_gain": 0.23124999999999996,
+    "targeted_absolute_gain": 0.23124999999999984,
     "targeted_gain_95": [
-      0.1416666666666666,
-      0.31875
+      0.14166666666666694,
+      0.31875000000000026
     ],
-    "targeted_gain_per_dollar": 0.0001751893939393939,
-    "targeted_to_random_gain_per_dollar_ratio": 2.0555555555555562
+    "targeted_gain_per_dollar": 0.00017518939393939382,
+    "targeted_to_random_gain_per_dollar_ratio": 2.055555555555547
   },
   "protocol_id": "capy-yam-fixed-insertion-v1",
   "provenance": {

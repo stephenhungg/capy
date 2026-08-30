@@ -1,42 +1,96 @@
 # capy
 
-capy is the experience network for physical intelligence.
+capy is an evidence and settlement network for physical intelligence.
 
-robots fail in specific ways. capy turns those failures into targeted data requests, verifies whether the resulting experience improves a policy, and pays the contributors responsible for the improvement.
-
-## how it works
+robots fail in specific ways. capy turns a failure into a signed capability contract, accepts camera-free experience from a local robot boundary, measures whether the experience produced a real capability gain, attributes that gain, and authorizes contributor payouts in native USDC on Solana.
 
 ```text
-robot failure
-  -> capability specification
-  -> targeted human, robot, or simulated experience
-  -> policy training
-  -> held-out simulation and real-robot evaluation
-  -> capability receipt
-  -> contributor payout in USDC on Solana
+failure → contract → experience → evaluation → attribution → payout
+              signed evidence and trust gates all the way through
 ```
 
-## the core object
+## what works
 
-a capability receipt connects:
+- an authenticated, role-separated web platform for buyers, contributors, evaluators, and operators;
+- durable D1 workflow state, memberships, invitations, idempotent commands, audit events, and executor handoffs;
+- immutable protocol objects in R2 with storage-byte and RFC 8785 object-digest verification;
+- a direct, camera-free i2rt recorder contract using synchronized JSON MCAP channels;
+- an i2rt journal-to-evidence bridge that hashes source bytes and preserves safety and intervention events;
+- a falsifiable hidden-trial evaluation laboratory;
+- a deterministic bounty compiler with conserved cohort attribution;
+- a memo-less Solana USDC payout planner and isolated executor state machine;
+- public receipts that resolve and verify the stored protocol chain before returning results.
 
-- the robot failure and supporting evidence;
-- the requested capability and evaluation protocol;
-- the data cohorts and their usage rights;
-- the model, training lineage, and held-out results;
-- the contribution calculation and Solana settlement proof.
+mainnet execution is intentionally disabled. the current capability and evaluation data are labeled synthetic, and no live robot or camera is connected.
 
-## current research stack
+## architecture
 
-- `VIMA` for evidence memory, object events, and failure localization;
-- `i2rt YAM` for teleoperation, embodiment-grounded collection, and real evaluation;
-- `MCAP` for synchronized raw robot logs;
-- `LeRobot Dataset v3` for normalized training data;
-- simulation for cheap breadth and real hardware for ground truth;
-- native `USDC` on Solana for contributor payouts.
+```text
+i2rt edge                         capy control plane                    isolated payout rail
+─────────                         ──────────────────                    ────────────────────
+motor + safety loop               authenticated role workflow          signed authorization
+crash-safe journal   ──────────▶  evidence + evaluation objects  ───▶  memo-less USDC plan
+camera-free MCAP                  trust gates + audit ledger            Solana executor
+                                  D1 state + R2 immutable bytes         reconciliation receipt
 
-## status
+the cloud never commands the robot. the public chain never receives contributor ids.
+```
 
-capy is at the research and closed-loop prototype stage. the first falsifiable claim is that failure-targeted collection can produce more verified capability gain per dollar than random teleoperation.
+## protocol spine
 
-the immediate milestone is one inspectable loop: one failure, one targeted collection job, one trained candidate, one held-out capability improvement, and one reconciled Solana payout.
+every transition is joined by immutable identifiers and digests:
+
+1. capability manifest
+2. episode cohort
+3. evaluation receipt
+4. attribution result
+5. Solana payout manifest
+
+the canonical schemas and linked example objects live in [`schemas/`](./schemas) and [`docs/protocol/`](./docs/protocol).
+
+## repo map
+
+- `apps/web` — authenticated Sites application, D1 schema, R2 object store, workflow, receipts, and operations UI
+- `packages/i2rt-recorder` — camera-free i2rt journal and MCAP export
+- `packages/evidence-bridge` — VIMA / World Context projections into the capy evidence contract
+- `packages/eval-lab` — registered hidden-trial evaluation harness
+- `packages/bounty-engine` — deterministic allocation and payout compilation
+- `packages/solana-payouts` — signed authorization adapter, transfer planner, executor, and reconciliation state
+- `docs/architecture` — edge/control/executor boundaries and service contracts
+- `docs/governance` — rights, privacy, provenance, disputes, and treasury policy
+
+## run the web app
+
+```bash
+cd apps/web
+npm install
+npm run db:migrate:local
+npm run dev
+```
+
+the local Sites identity is provided by the development runtime. start at `http://localhost:3000` and sign in through the supplied local flow.
+
+## verify the repository
+
+```bash
+npm test
+
+cd apps/web
+npm run lint
+npm run typecheck
+npm run build
+
+cd ../../packages/solana-payouts
+npm run check
+npm test
+
+cd ../bounty-engine
+npm test
+
+cd ../evidence-bridge
+python -m unittest discover -s tests -v
+```
+
+## current boundary
+
+this is production-shaped infrastructure with a working synthetic end-to-end workflow. physical i2rt sessions, real model training, live hidden-set evaluation, treasury funding, and mainnet settlement remain explicit integrations—not claims hidden behind a polished dashboard.

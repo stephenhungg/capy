@@ -8,7 +8,7 @@ this package is the first capy contributor settlement rail. it transfers circle-
 2. require the manifest network and mint to match the compiled allowlist. mainnet dry-runs are supported, but mainnet submission is intentionally disabled.
 3. derive the treasury and recipient associated token accounts from the original token program. off-curve recipients are rejected pending a separately reviewed custody flow.
 4. build `createassociatedtokenidempotent` plus `transferchecked` for every payout. the fee payer funds missing atas and may differ from the treasury authority.
-5. add one non-sensitive batch memo. it contains a truncated manifest hash and batch id, never a contributor name, email, job id, capability id, or individual payout id.
+5. emit no memo or reference instruction. reconciliation stays in the restricted off-chain ledger and uses the signed transaction bytes plus returned signature.
 6. add payouts until the compiled legacy transaction would exceed 1,232 bytes, 64 accounts, or the operator's lower batch cap. hash the final plan so changing batching, signer roles, source account, or priority-fee policy cannot reuse an existing journal.
 7. before submission, verify rpc cluster identity against solana's official endpoint, inspect the mint and source token account, check usdc and sol balances, simulate, and set the compute limit to consumed units plus ten percent.
 8. sign the final bytes, atomically persist them with their expected signature, and only then submit. retries resend those exact bytes.

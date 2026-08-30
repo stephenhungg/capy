@@ -10,13 +10,13 @@
     "payoutRef": { "$ref": "common.schema.json#/$defs/opaqueId", "description": "internal random reference; never placed on-chain" },
     "walletBindingRef": { "$ref": "common.schema.json#/$defs/opaqueId" },
     "network": { "const": "solana" },
-    "cluster": { "const": "mainnet-beta" },
+    "cluster": { "enum": ["devnet", "mainnet-beta"] },
     "asset": {
       "type": "object",
       "required": ["symbol", "mint", "decimals", "tokenProgram"],
       "properties": {
         "symbol": { "const": "USDC" },
-        "mint": { "const": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" },
+        "mint": { "$ref": "common.schema.json#/$defs/solanaAddress" },
         "decimals": { "const": 6 },
         "tokenProgram": { "const": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
       },
@@ -38,7 +38,7 @@
     "memo": { "type": "null", "description": "normal capy profile forbids public memo content" },
     "providerTransferId": { "type": "string", "minLength": 8, "maxLength": 256 },
     "transactionSignature": { "$ref": "common.schema.json#/$defs/solanaSignature" },
-    "state": { "enum": ["created", "submitted", "confirmed", "finalized", "failed", "cancelled"] },
+    "state": { "enum": ["created", "submitted", "confirmed", "finalized", "failed", "cancelled", "reconciliation_required"] },
     "createdAt": { "$ref": "common.schema.json#/$defs/timestamp" },
     "submittedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
     "finalizedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
@@ -72,6 +72,25 @@
     "accessClass": { "const": "highly_restricted" }
   },
   "allOf": [
+    {
+      "if": { "properties": { "cluster": { "const": "devnet" } }, "required": ["cluster"] },
+      "then": {
+        "properties": {
+          "asset": {
+            "type": "object",
+            "properties": { "mint": { "const": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU" } }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "asset": {
+            "type": "object",
+            "properties": { "mint": { "const": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" } }
+          }
+        }
+      }
+    },
     {
       "if": { "properties": { "onchainReferenceMethod": { "const": "none" } }, "required": ["onchainReferenceMethod"] },
       "then": { "properties": { "onchainReference": { "type": "null" } } },

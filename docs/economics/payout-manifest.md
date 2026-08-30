@@ -10,7 +10,7 @@ v0.1 is intentionally unsigned. a settlement service must:
 2. verify the source token account exists, is owned by the declared token program, uses the declared mint, and has enough balance;
 3. verify each recipient owner on chain, derive the associated token account for the declared mint/program, and create it idempotently when absent;
 4. issue `TransferChecked` with the manifest's mint, decimals, and atomic amount;
-5. attach the manifest id as a memo or settlement-ledger reference and record transaction signatures per transfer;
+5. keep the manifest id only in the restricted settlement ledger and record transaction signatures per transfer; emit no public memo or reference instruction;
 6. never execute more than once for a `transferId`.
 
 Solana's official payment guidance requires deriving and checking the recipient associated token account rather than assuming the owner address is itself a token account ([verify address](https://solana.com/docs/payments/send-payments/verify-address)). `TransferChecked` verifies the mint and decimals during transfer ([token CPI](https://solana.com/docs/tokens/advanced/cpi)). that is why the manifest carries owner addresses, leaves `recipientTokenAccount` null until execution, and uses integer atomic amounts.

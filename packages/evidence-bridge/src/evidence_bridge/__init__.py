@@ -7,6 +7,12 @@ from .adapters import (
     adapt_world_context_prior,
     build_failure_claims,
 )
+from .i2rt_journal import (
+    I2RTEpisodeProjection,
+    I2RTJournalProjection,
+    SourceJournalDigests,
+    adapt_i2rt_journal,
+)
 from .taxonomy import (
     Citation,
     ClaimStatus,
@@ -26,11 +32,15 @@ __all__ = [
     "EvidenceEnvelope",
     "EvidenceType",
     "FailureClaim",
+    "I2RTEpisodeProjection",
+    "I2RTJournalProjection",
     "I2RTThresholds",
     "ProvenanceKind",
+    "SourceJournalDigests",
     "SourceSystem",
     "TemporalPhase",
     "TemporalSpan",
+    "adapt_i2rt_journal",
     "adapt_i2rt_telemetry",
     "adapt_vima_episode",
     "adapt_world_context_prior",

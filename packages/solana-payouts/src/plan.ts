@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { getSetComputeUnitLimitInstruction, getSetComputeUnitPriceInstruction } from "@solana-program/compute-budget";
-import { getAddMemoInstruction } from "@solana-program/memo";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ADDRESS,
   TOKEN_PROGRAM_ADDRESS,
@@ -32,6 +31,7 @@ import {
   USDC_DECIMALS
 } from "./constants.js";
 import type { ValidatedManifest, ValidatedPayout } from "./manifest.js";
+import { assertProtocolAuthorizationProjection } from "./protocol.js";
 
 const PLACEHOLDER_BLOCKHASH = "11111111111111111111111111111111";
 
@@ -97,6 +97,19 @@ export async function createPayoutPlan(
   manifest: ValidatedManifest,
   options: PlanOptions
 ): Promise<PayoutPlan> {
+  const authorization = manifest.authorization;
+  if (authorization.source === "protocol-payout-manifest") {
+    assertProtocolAuthorizationProjection(manifest);
+    if (options.treasuryAuthority !== authorization.treasuryAuthority) {
+      throw new Error("treasury authority does not match the protocol payout authorization");
+    }
+    if (
+      options.sourceTokenAccount !== undefined &&
+      options.sourceTokenAccount !== authorization.sourceTokenAccount
+    ) {
+      throw new Error("source token account does not match the protocol payout authorization");
+    }
+  }
   const maxPayoutsPerBatch = options.maxPayoutsPerBatch ?? DEFAULT_MAX_PAYOUTS_PER_BATCH;
   if (!Number.isSafeInteger(maxPayoutsPerBatch) || maxPayoutsPerBatch < 1 || maxPayoutsPerBatch > 32) {
     throw new Error("maxPayoutsPerBatch must be an integer from 1 through 32");
@@ -113,7 +126,10 @@ export async function createPayoutPlan(
     owner: options.treasuryAuthority,
     tokenProgram: TOKEN_PROGRAM_ADDRESS
   });
-  const sourceTokenAccount = options.sourceTokenAccount ?? derivedSourceTokenAccount;
+  const sourceTokenAccount =
+    authorization.source === "protocol-payout-manifest"
+      ? authorization.sourceTokenAccount
+      : (options.sourceTokenAccount ?? derivedSourceTokenAccount);
   const plannedPayouts: PlannedPayout[] = await Promise.all(
     manifest.payouts.map(async (payout) => {
       const [recipientTokenAccount] = await findAssociatedTokenPda({
@@ -121,6 +137,14 @@ export async function createPayoutPlan(
         owner: payout.recipientWallet,
         tokenProgram: TOKEN_PROGRAM_ADDRESS
       });
+      if (authorization.source === "protocol-payout-manifest") {
+        const authorizedTransfer = authorization.transfers.find(
+          (transfer) => transfer.payoutId === payout.payoutId
+        );
+        if (!authorizedTransfer || authorizedTransfer.recipientTokenAccount !== recipientTokenAccount) {
+          throw new Error(`recipient token account changed for payout ${payout.payoutId}`);
+        }
+      }
       return { ...payout, recipientTokenAccount };
     })
   );
@@ -208,9 +232,6 @@ export function buildBatchTransaction(
     ...(plan.priorityFeeMicroLamports > 0n
       ? [getSetComputeUnitPriceInstruction({ microLamports: plan.priorityFeeMicroLamports })]
       : []),
-    getAddMemoInstruction({
-      memo: `capy:payout:v1:${plan.manifest.manifestHash.slice(0, 16)}:${batch.batchId}`
-    }),
     ...batch.payouts.flatMap((payout) => [
       getCreateAssociatedTokenIdempotentInstruction({
         payer,
@@ -252,6 +273,8 @@ export function planToJson(plan: PayoutPlan): object {
     dry_run: true,
     manifest_id: plan.manifest.manifest.manifest_id,
     manifest_hash: plan.manifest.manifestHash,
+    authorization_object_id: plan.manifest.authorization.objectId,
+    authorization_digest: plan.manifest.authorization.digest,
     network: plan.manifest.manifest.network,
     mint: plan.manifest.mint,
     treasury_authority: plan.treasuryAuthority,
@@ -279,6 +302,8 @@ export function getPlanHash(plan: PayoutPlan): string {
     .update(
       JSON.stringify({
         manifest_hash: plan.manifest.manifestHash,
+        authorization_object_id: plan.manifest.authorization.objectId,
+        authorization_digest: plan.manifest.authorization.digest,
         treasury_authority: plan.treasuryAuthority,
         source_token_account: plan.sourceTokenAccount,
         fee_payer: plan.feePayer,

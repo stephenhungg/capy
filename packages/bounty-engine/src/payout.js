@@ -47,11 +47,12 @@ function validateInput(input) {
 
   const contributionIds = new Set();
   const contentHashes = new Set();
-  const contributorAddresses = new Map();
+  const allocations = new Map();
   if (!Array.isArray(input.contributions) || input.contributions.length === 0) {
     throw new TypeError("contributions cannot be empty");
   }
   for (const contribution of input.contributions) {
+    assertNonEmpty(contribution.allocationId, "contribution.allocationId");
     assertNonEmpty(contribution.contributionId, "contribution.contributionId");
     assertNonEmpty(contribution.contributorId, "contribution.contributorId");
     assertNonEmpty(contribution.cohortId, "contribution.cohortId");
@@ -67,13 +68,22 @@ function validateInput(input) {
     if (contentHashes.has(contribution.contentHash)) {
       throw new TypeError(`duplicate content hash: ${contribution.contentHash}`);
     }
-    const previousAddress = contributorAddresses.get(contribution.contributorId);
-    if (previousAddress && previousAddress !== contribution.payoutAddress) {
-      throw new TypeError(`contributor ${contribution.contributorId} has multiple payout addresses`);
+
+    const allocationIdentity = {
+      contributorId: contribution.contributorId,
+      cohortId: contribution.cohortId,
+      payoutAddress: contribution.payoutAddress,
+    };
+    const previousAllocation = allocations.get(contribution.allocationId);
+    if (previousAllocation && canonicalize(previousAllocation) !== canonicalize(allocationIdentity)) {
+      throw new TypeError(
+        `allocation ${contribution.allocationId} must use one contributor, cohort, and payout address`,
+      );
     }
+
     contributionIds.add(contribution.contributionId);
     contentHashes.add(contribution.contentHash);
-    contributorAddresses.set(contribution.contributorId, contribution.payoutAddress);
+    allocations.set(contribution.allocationId, allocationIdentity);
   }
 }
 
@@ -174,16 +184,23 @@ export function calculatePayoutManifest(input) {
   const transferMap = new Map();
   for (const item of lineItems) {
     const contribution = contributionById.get(item.contributionId);
-    const transfer = transferMap.get(contribution.payoutAddress) ?? {
+    const transferKey = canonicalize({
+      allocationId: contribution.allocationId,
+      contributorId: contribution.contributorId,
+      cohortId: contribution.cohortId,
+      payoutAddress: contribution.payoutAddress,
+    });
+    const transfer = transferMap.get(transferKey) ?? {
+      allocationId: contribution.allocationId,
+      contributorId: contribution.contributorId,
+      cohortId: contribution.cohortId,
       recipientOwner: contribution.payoutAddress,
       amount: 0n,
-      contributorIds: new Set(),
       lineItems: [],
     };
     transfer.amount += BigInt(item.amountAtomic);
-    transfer.contributorIds.add(contribution.contributorId);
     transfer.lineItems.push(item);
-    transferMap.set(contribution.payoutAddress, transfer);
+    transferMap.set(transferKey, transfer);
   }
 
   const paid = [...transferMap.values()].reduce((sum, transfer) => sum + transfer.amount, 0n);
@@ -218,17 +235,28 @@ export function calculatePayoutManifest(input) {
       withheldAtomic: withheld.toString(),
     },
     transfers: [...transferMap.values()]
-      .sort((left, right) => left.recipientOwner.localeCompare(right.recipientOwner))
+      .sort(
+        (left, right) =>
+          left.allocationId.localeCompare(right.allocationId) ||
+          left.contributorId.localeCompare(right.contributorId) ||
+          left.cohortId.localeCompare(right.cohortId) ||
+          left.recipientOwner.localeCompare(right.recipientOwner),
+      )
       .map((transfer) => ({
         transferId: deterministicId("transfer", {
           bountyId: input.bountyId,
+          allocationId: transfer.allocationId,
+          contributorId: transfer.contributorId,
+          cohortId: transfer.cohortId,
           recipientOwner: transfer.recipientOwner,
           amountAtomic: transfer.amount.toString(),
         }),
+        allocationId: transfer.allocationId,
+        contributorId: transfer.contributorId,
+        cohortId: transfer.cohortId,
         recipientOwner: transfer.recipientOwner,
         recipientTokenAccount: null,
         amountAtomic: transfer.amount.toString(),
-        contributorIds: [...transfer.contributorIds].sort(),
         lineItems: transfer.lineItems.sort(
           (left, right) =>
             left.contributionId.localeCompare(right.contributionId) || left.pool.localeCompare(right.pool),

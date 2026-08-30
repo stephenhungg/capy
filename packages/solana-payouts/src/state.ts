@@ -38,6 +38,8 @@ const payoutStateSchema = z
     schema: z.literal("capy.payout-state.v1"),
     manifest_id: z.string().min(8).max(64),
     manifest_hash: z.string().regex(/^[a-f0-9]{64}$/),
+    authorization_object_id: z.string().min(1).max(2_048),
+    authorization_digest: z.string().regex(/^sha256:[a-f0-9]{64}$/),
     plan_hash: z.string().regex(/^[a-f0-9]{64}$/),
     network: z.enum(["devnet", "mainnet-beta"]),
     mint: z.string().min(32).max(44),
@@ -57,6 +59,8 @@ export type PayoutStateV1 = z.infer<typeof payoutStateSchema>;
 export interface StateIdentity {
   readonly manifestId: string;
   readonly manifestHash: string;
+  readonly authorizationObjectId: string;
+  readonly authorizationDigest: string;
   readonly planHash: string;
   readonly network: PayoutNetwork;
   readonly mint: string;
@@ -71,6 +75,8 @@ export function createPayoutState(identity: StateIdentity, now = new Date()): Pa
     schema: "capy.payout-state.v1",
     manifest_id: identity.manifestId,
     manifest_hash: identity.manifestHash,
+    authorization_object_id: identity.authorizationObjectId,
+    authorization_digest: identity.authorizationDigest,
     plan_hash: identity.planHash,
     network: identity.network,
     mint: identity.mint,
@@ -87,6 +93,8 @@ export function assertStateIdentity(state: PayoutStateV1, identity: StateIdentit
   const fields: ReadonlyArray<[string, string, string]> = [
     ["manifest_id", state.manifest_id, identity.manifestId],
     ["manifest_hash", state.manifest_hash, identity.manifestHash],
+    ["authorization_object_id", state.authorization_object_id, identity.authorizationObjectId],
+    ["authorization_digest", state.authorization_digest, identity.authorizationDigest],
     ["plan_hash", state.plan_hash, identity.planHash],
     ["network", state.network, identity.network],
     ["mint", state.mint, identity.mint],

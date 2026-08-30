@@ -137,24 +137,20 @@
       "required": ["middleware", "raw_evidence", "normalized_training"],
       "properties": {
         "middleware": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["name", "distribution", "time_basis", "frame_semantics"],
-          "properties": {
-            "name": {"const": "ROS 2"},
-            "distribution": {"type": "string", "minLength": 1, "maxLength": 64},
-            "time_basis": {"enum": ["system_time", "ros_time"]},
-            "frame_semantics": {"const": "tf2"}
-          }
+          "oneOf": [
+            {"$ref": "#/$defs/ros2Middleware"},
+            {"$ref": "#/$defs/directI2rtMiddleware"}
+          ]
         },
         "raw_evidence": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["container", "container_major_version", "recorder", "message_encoding", "channels", "index_required", "crc_required_after_ingest"],
+          "required": ["container", "container_major_version", "profile", "producer", "message_encoding", "channels", "index_required", "crc_required_after_ingest"],
           "properties": {
             "container": {"const": "MCAP"},
             "container_major_version": {"const": "0"},
-            "recorder": {"const": "rosbag2_storage_mcap"},
+            "profile": {"enum": ["ros2.mcap.v1", "capy.i2rt.camera_free.v1"]},
+            "producer": {"$ref": "#/$defs/mcapProducer"},
             "message_encoding": {"enum": ["cdr", "protobuf", "json"]},
             "channels": {
               "type": "array",
@@ -207,7 +203,63 @@
         }
       }
     },
+    "ros2Middleware": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name", "distribution", "time_basis", "frame_semantics"],
+      "properties": {
+        "kind": {"const": "ros2"},
+        "name": {"const": "ROS 2"},
+        "distribution": {"type": "string", "minLength": 1, "maxLength": 64},
+        "time_basis": {"enum": ["system_time", "ros_time"]},
+        "frame_semantics": {"const": "tf2"}
+      }
+    },
+    "directI2rtMiddleware": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name", "version", "time_basis", "frame_semantics"],
+      "properties": {
+        "kind": {"const": "direct_i2rt"},
+        "name": {"const": "i2rt"},
+        "version": {"type": "string", "minLength": 1, "maxLength": 64},
+        "time_basis": {"const": "system_time"},
+        "frame_semantics": {"const": "fixed_geometry"}
+      }
+    },
+    "mcapProducer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "name", "version", "source_revision"],
+          "properties": {
+            "kind": {"const": "ros2"},
+            "name": {"const": "rosbag2_storage_mcap"},
+            "version": {"type": "string", "minLength": 1, "maxLength": 64},
+            "source_revision": {"type": "string", "minLength": 1, "maxLength": 128}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "name", "version", "source_revision"],
+          "properties": {
+            "kind": {"const": "direct_i2rt"},
+            "name": {"const": "capy_i2rt_recorder"},
+            "version": {"type": "string", "minLength": 1, "maxLength": 64},
+            "source_revision": {"type": "string", "minLength": 1, "maxLength": 128}
+          }
+        }
+      ]
+    },
     "channel": {
+      "oneOf": [
+        {"$ref": "#/$defs/ros2Channel"},
+        {"$ref": "#/$defs/directI2rtChannel"}
+      ]
+    },
+    "ros2Channel": {
       "type": "object",
       "additionalProperties": false,
       "required": ["topic", "ros_type", "direction", "required", "qos"],
@@ -217,6 +269,17 @@
         "direction": {"enum": ["observation", "action", "event", "transform", "diagnostic"]},
         "required": {"type": "boolean"},
         "qos": {"$ref": "common.schema.json#/$defs/qosProfile"}
+      }
+    },
+    "directI2rtChannel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["topic", "schema_name", "direction", "required"],
+      "properties": {
+        "topic": {"type": "string", "pattern": "^/capy/"},
+        "schema_name": {"const": "capy.i2rt.camera_free.v1"},
+        "direction": {"enum": ["observation", "action", "event", "diagnostic"]},
+        "required": {"type": "boolean"}
       }
     },
     "feature": {

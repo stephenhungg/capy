@@ -38,3 +38,15 @@ relevant implementation surfaces:
 - `docs/YOLODEX_MEMORY.md`: describes episodic retrieval and cited answer flow.
 
 important observed gaps drive adapter validation: episode rows have frame basenames but no stable source-video id/uri/hash, extraction version, frame hash, or calibrated confidence. the adapter therefore requires capy-owned source identity and a video uri, and preserves the vima artifact separately.
+
+## camera-free i2rt recorder
+
+repository package inspected:
+
+- `packages/i2rt-recorder/src/i2rt_recorder/recorder.py`: session/episode lifecycle, frame, intervention, safety, clock-issue, and manual outcome events;
+- `packages/i2rt-recorder/src/i2rt_recorder/rawlog.py`: canonical append-only `events.ndjson` and `manifest.json` source journal;
+- `packages/i2rt-recorder/src/i2rt_recorder/model.py`: `capy.i2rt.camera_free.v1` manifest, robot layout, capture quality, and manual outcome values;
+- `packages/i2rt-recorder/src/i2rt_recorder/validation.py`: sequence, time, boundary, shape, and camera-free invariants;
+- `packages/i2rt-recorder/src/i2rt_recorder/export_mcap.py`: deterministic MCAP export and `capy_source_journal` digest metadata.
+
+the evidence adapter mirrors those journal boundaries while retaining a separate trust boundary: recorder instructions are not protocol task ids, terminal outcomes are manual assertions rather than independent evaluation results, and a valid journal does not by itself prove that its derived MCAP is indexed or crc-verified.

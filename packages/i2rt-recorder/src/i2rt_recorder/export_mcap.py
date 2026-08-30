@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,14 @@ _EVENT_SCHEMA: dict[str, Any] = {
         "payload",
     ],
 }
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return f"sha256:{digest.hexdigest()}"
 
 
 def export_mcap(raw_root: Path, output_path: Path) -> Path:
@@ -66,6 +75,14 @@ def export_mcap(raw_root: Path, output_path: Path) -> Path:
             for event_type in topics
         }
         writer.add_metadata(name="capy_manifest", data={"json": canonical_json(manifest)})
+        writer.add_metadata(
+            name="capy_source_journal",
+            data={
+                "format": "capy.ndjson.camera_free.v1",
+                "manifest_digest": _sha256_file(raw_root / "manifest.json"),
+                "events_digest": _sha256_file(raw_root / "events.ndjson"),
+            },
+        )
         for event in events:
             wall_time = int(event["recorder_wall_time_ns"])
             source_wall_time = event.get("payload", {}).get("source_wall_time_ns")

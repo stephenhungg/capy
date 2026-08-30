@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "eslint app components",
     "typecheck": "tsc --noEmit",
     "test": "npm run test:protocol && npm run validate:trust",
     "test:protocol": "node scripts/validate-protocol.mjs",

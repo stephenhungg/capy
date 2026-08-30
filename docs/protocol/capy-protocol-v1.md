@@ -30,12 +30,12 @@ a conforming capy network preserves these invariants:
 
 - every accepted object is immutable, schema-valid, content-digested, signed, and linked to predecessors by both identifier and digest;
 - raw robot evidence remains available as MCAP; a LeRobot v3 dataset is a derived training view, never a replacement for raw evidence;
-- ROS 2 message types, topic semantics, clocks, QoS, and tf2 frames describe robot I/O rather than capy-specific equivalents;
+- each capability declares either a ROS 2 interface or a direct I2RT capture profile; the producer, clocks, schemas, and frame semantics are explicit and never inferred from the MCAP container alone;
 - training data and hidden evaluation items do not overlap, and candidate builders cannot observe hidden item identities or item-level outcomes;
 - rights, consent, and revocation are checked at ingest, training, evaluation, attribution, and immediately before payout;
 - attribution inputs and code are pinned, allocation conserves the payout pool exactly in token base units, and rounding is declared;
 - personal data, licenses, consent records, raw episodes, hidden-set contents, model artifacts, and attribution traces stay offchain;
-- Solana receives only the minimum settlement facts: public addresses, token amounts, a manifest identifier memo, and transaction signatures;
+- Solana receives only the minimum settlement facts: public addresses, token amounts, and transaction signatures; capy emits no payout memo or public correlation reference;
 - a schema-valid object is not automatically trustworthy. signature authorization, artifact retrieval, semantic validation, and external-state checks are separate required layers.
 
 ## 3. roles and trust boundaries
@@ -171,11 +171,13 @@ artifact URIs are locations, not identities. mirrors may change the URI while re
 
 ## 7. robotics data profile
 
-### 7.1 ROS 2 is the interface vocabulary
+### 7.1 interface profiles are explicit
 
-capy follows the ROS 2 split between topics for streams, services for short request/response operations, and actions for long-running cancellable operations. recorded evidence identifies concrete `.msg` types and QoS. frame relationships use tf2, including `/tf` and `/tf_static`; capy does not create a second frame graph.
+the `ros2` profile follows the ROS 2 split between topics for streams, services for short request/response operations, and actions for long-running cancellable operations. recorded evidence identifies concrete `.msg` types and QoS. frame relationships use tf2, including `/tf` and `/tf_static`; capy does not create a second frame graph.
 
-continuous state, action commands, task inputs, success events, transforms, and diagnostics required to reproduce an episode must be recorded as topics. if a service or action affects an episode, its request, feedback, cancellation, and result events must also appear in the evidence log through the ROS 2 recording conventions used by that deployment.
+the `direct_i2rt` profile records the final command sent to the motor chain, feedback returned by the same control cycle, upstream teleoperation or policy target, controller state, fixed-geometry identifier, lifecycle, intervention, safety, clock, and manual outcome events. it uses the schema name and MCAP profile `capy.i2rt.camera_free.v1`, JSON Schema plus canonical JSON messages, and `fixed_geometry` frame semantics. it must never be labeled as ROS 2 or rosbag2 evidence.
+
+continuous state, action commands, task inputs, success events, transforms or fixed geometry, and diagnostics required to reproduce an episode must be present in the declared profile. if a ROS 2 service or action affects an episode, its request, feedback, cancellation, and result events must also appear in the evidence log through the ROS 2 recording conventions used by that deployment.
 
 QoS is part of the capability contract. a recorder must subscribe compatibly and document any loss. best-effort sensor data is permitted when declared; control commands, static task inputs, success events, and safety diagnostics should be reliable. static task inputs and `/tf_static` should use transient-local durability.
 
@@ -183,19 +185,19 @@ QoS is part of the capability contract. a recorder must subscribe compatibly and
 
 ### 7.2 MCAP is the raw evidence container
 
-raw recordings use MCAP major version 0, ordinarily written by the ROS 2 `rosbag2_storage_mcap` plugin with CDR message encoding.
+raw recordings use MCAP major version 0. accepted producers are declared, versioned, and revision-pinned: either the ROS 2 `rosbag2_storage_mcap` plugin or `capy_i2rt_recorder`. the direct I2RT producer deterministically derives indexed MCAP from a crash-safe canonical NDJSON edge journal and stores the source manifest and event-stream digests in MCAP metadata.
 
 an accepted cohort must have:
 
 - every required schema, channel, and message stream needed by the capability;
 - chunk and message indices for seeking and topic-selective reads;
 - CRC verification after ingest;
-- a topics digest covering topic names, ROS types, serialization, QoS, and message counts;
+- a topics digest covering topic names, schemas or ROS types, serialization, applicable QoS, and message counts;
 - monotonic per-episode normalized timestamps;
 - calibration, robot description, and fixture metadata as hashed external artifacts or MCAP attachments;
 - no reliance on private MCAP records for required interoperable semantics.
 
-resource-constrained capture may temporarily use rosbag2's `fastwrite` profile. before cohort issuance, the collector must post-process it into an indexed MCAP, enable integrity checks, verify the resulting file, and retain lineage from source bytes to accepted bytes. a `fastwrite` file cannot directly satisfy the cohort schema's `indexed: true` and `crc_verified: true` assertions.
+resource-constrained ROS 2 capture may temporarily use rosbag2's `fastwrite` profile. before cohort issuance, the collector must post-process it into an indexed MCAP, enable integrity checks, verify the resulting file, and retain lineage from source bytes to accepted bytes. a `fastwrite` file cannot directly satisfy the cohort schema's `indexed: true` and `crc_verified: true` assertions. direct I2RT capture uses its NDJSON journal for crash recovery and only the derived, indexed, CRC-verified MCAP may enter a cohort.
 
 ### 7.3 LeRobot Dataset v3 is the normalized training view
 
@@ -219,9 +221,9 @@ when `use_videos` is false, no `videos/` directory, `image` or `video` dtype, or
 the capability manifest is the immutable job and evaluation contract. it binds:
 
 - requester and validity window;
-- embodiment, robot/fixture descriptions, controlled joint order, and tf2 frames;
+- embodiment, robot/fixture descriptions, controlled joint order, and declared tf2 or fixed-geometry frame semantics;
 - task instruction, initial conditions, machine-readable success signal, failure conditions, and duration;
-- ROS 2 middleware, required MCAP channels, message encodings, QoS, and clock;
+- interface profile, producer revision, required MCAP channels, message encodings, applicable QoS, and clock;
 - exact LeRobot v3 features and whether vision is allowed;
 - baseline policy, baseline failure evidence, failure rate, and sample size;
 - collection source, minimum counts, required variations, and prohibited modalities;
@@ -301,11 +303,11 @@ the Solana payout manifest is a signed offchain instruction plan and settlement 
 - token symbol, mint, decimals, and Token Program;
 - treasury owner and source token account;
 - recipient owner/token accounts, attribution allocation IDs, and base-unit amounts;
-- transaction batches using SPL Token `TransferChecked` and the SPL Memo program;
+- transaction batches using SPL Token `TransferChecked` with `memo: null`;
 - finalized commitment, preflight rules, idempotency behavior, settlement state, and observed transactions;
 - the explicit list of facts permitted onchain.
 
-the planned manifest is immutable. its memo must be `capy:payout:<planned object_id>`. submitted, finalized, failed, or cancelled state is represented by a new payout manifest that supersedes the planned object and retains its transaction plan and memo. finalized transaction evidence therefore points back to the original intent even though the settlement record has a new object ID.
+the planned manifest is immutable. submitted, finalized, failed, or cancelled state is represented by a new payout manifest that supersedes the planned object and retains its transaction plan. the restricted off-chain settlement ledger binds the planned object and transfer IDs to transaction signatures; those identifiers are never copied into public transaction metadata.
 
 before signing or submitting a batch, the executor must:
 
@@ -320,11 +322,11 @@ before signing or submitting a batch, the executor must:
 9. reserve each transfer in an idempotency ledger before submission;
 10. simulate/preflight the exact signed transaction.
 
-each batch includes `TransferChecked` instructions and one memo. a Solana transaction is atomic within the batch; multiple batches are not atomic together. retries must contain only unsettled batches. the idempotency key is `(genesis_hash, mint, planned_manifest_id, transfer_id)`. a memo is observable evidence, not duplicate-payment enforcement.
+each batch includes only the compute-budget, associated-token-account, and `TransferChecked` instructions required for settlement. a Solana transaction is atomic within the batch; multiple batches are not atomic together. retries must contain only unsettled batches. the idempotency key is `(genesis_hash, mint, planned_manifest_id, transfer_id)` and exists only in the restricted off-chain ledger.
 
-settlement is complete only when every batch is returned by a trusted RPC at `finalized` commitment, has no execution error, contains the expected memo and transfer instructions, and produces the expected token balance deltas. RPC responses must be verified against at least one independent endpoint for production payouts.
+settlement is complete only when every batch is returned by a trusted RPC at `finalized` commitment, has no execution error, contains exactly the approved transfer instructions with no memo or reference instruction, and produces the expected token balance deltas. RPC responses must be verified against at least one independent endpoint for production payouts.
 
-protocol 1.0 uses standard SPL Token and Memo programs and no capy onchain program. that keeps chain state small but means duplicate prevention, multi-batch coordination, revocation gating, and manifest authorization remain offchain.
+protocol 1.0 uses the standard SPL Token program and no memo, reference account, or capy onchain program. duplicate prevention, multi-batch coordination, revocation gating, manifest authorization, and intent-to-signature reconciliation remain offchain.
 
 ## 9. hidden evaluation protocol
 
@@ -387,7 +389,6 @@ revocation cannot rewrite an immutable audit object, reverse a finalized blockch
 | models, code, configurations, traces | offchain | size and reproducibility |
 | attribution calculations | offchain | method complexity and auditability |
 | wallet/token accounts and transfer amounts | Solana | settlement |
-| planned manifest object ID | Solana memo log | public reconciliation handle |
 | transaction signature and slot | Solana and finalized payout object | settlement proof |
 
 only hashes and opaque identifiers cross boundaries. a hash may still enable correlation or disclosure when the input space is small, which is why hidden-set manifests include a random nonce and personal records are encrypted rather than merely hashed.
@@ -490,26 +491,26 @@ base58 syntax does not prove account ownership or token semantics. executors mus
 the linked fixture chain under [`examples/`](./examples/) models a right-arm I2RT YAM pressing a guarded button with:
 
 - six arm joints plus a linear gripper;
-- ROS 2 joint state/effort, target pose, switch, tf2, command, and diagnostic topics;
-- indexed MCAP raw evidence written through rosbag2;
+- direct I2RT command, state, teleoperation, lifecycle, intervention, and safety event channels;
+- indexed MCAP raw evidence derived deterministically from the crash-safe edge journal by `capy_i2rt_recorder`;
 - LeRobot v3 Parquet features with `use_videos: false` and no visual feature keys;
 - 120 teleoperated episodes, explicit operator and fixture-provider rights, consent, and revocation snapshots;
 - a 40-trial sealed evaluation improving success from `0.35` to `0.75` with zero candidate safety violations;
 - deterministic 75/25 contributor attribution of a 100 USDC devnet pool;
-- a planned SPL Token `TransferChecked` batch using Circle's devnet USDC mint and an SPL Memo reconciliation ID.
+- a planned memo-less SPL Token `TransferChecked` batch using Circle's devnet USDC mint.
 
 artifact locations, actors, keys, model hashes, and recipient accounts are synthetic. the devnet genesis hash and Circle-published devnet USDC mint are real identifiers used to make the boundary concrete. no example transaction is submitted.
 
 ## 16. decisions
 
-1. raw evidence is MCAP, normalized training data is LeRobot v3, and live semantics are ROS 2. capy only defines the cross-system contract.
+1. raw evidence is MCAP and normalized training data is LeRobot v3. live semantics may be ROS 2 or a declared direct I2RT profile; capy defines the cross-system contract without pretending one producer is another.
 2. protocol objects are immutable signed JSON; SHA-256 over RFC 8785 canonical bytes binds content while references bind the graph.
 3. object ID and digest are separate to avoid a self-hash cycle and to support supersession.
 4. hidden evaluation publishes a pre-training salted commitment, access evidence, and aggregates; item contents stay sealed.
 5. rights, consent, capture facts, and revocation are distinct fields and are rechecked throughout the lifecycle.
 6. attribution method is program-selected and executable, not hardcoded as one allegedly universal causal formula.
 7. token quantities use integer base-unit strings and millionth weights so accounting is exact and portable.
-8. protocol 1.0 uses standard SPL Token and Memo instructions with an offchain idempotency ledger instead of a new Solana program.
+8. protocol 1.0 uses standard SPL Token instructions with a restricted offchain idempotency ledger, no public memo, and no new Solana program.
 9. settlement facts are public; personal, legal, robotics, evaluation, and model data stay offchain.
 10. published schemas are strict and immutable. behavioral evolution uses explicit versions and superseding objects.
 
@@ -520,7 +521,7 @@ artifact locations, actors, keys, model hashes, and recipient accounts are synth
 - a hidden-set custodian can leak, substitute execution, or collude even when the published commitment is correct;
 - repeated aggregate evaluation can leak enough signal to overfit a fixed hidden set;
 - high-rate robot telemetry can fingerprint humans despite having no camera or audio;
-- ROS 2 distribution, message package, MCAP writer, and LeRobot implementation drift can change derived bytes or timing;
+- interface runtime, schema package, MCAP writer, and LeRobot implementation drift can change derived bytes or timing;
 - artifact storage loss breaks auditability even though object hashes remain;
 - standard SPL transfers cannot enforce capy authorization or prevent duplicate payment onchain; protocol 1.0 relies on operational controls;
 - rights, consent, employment, tax, sanctions, and payout rules vary by jurisdiction and need governing terms outside this technical protocol;
@@ -535,8 +536,8 @@ the next slice should be one narrow, executable loop rather than a general marke
 3. implement MCAP ingest validation plus one deterministic MCAP-to-LeRobot-v3 transform for the camera-free YAM feature contract;
 4. implement a sealed evaluator runner that verifies the precommitted set, runs paired baseline/candidate trials, and emits the evaluation receipt;
 5. implement the deterministic example attribution method and conservation checks;
-6. implement a devnet-only payout executor with account preflight, dry-run simulation, idempotency ledger, Memo plus `TransferChecked`, and finalized reconciliation;
-7. run the whole chain first against MuJoCo YAM plus a simulated switch, then repeat on one supervised physical YAM station.
+6. implement a devnet-only payout executor with account preflight, dry-run simulation, a restricted idempotency ledger, memo-less `TransferChecked`, and finalized reconciliation;
+7. run the whole chain first against the synthetic fixed-geometry keyed-peg fixture, then repeat on one supervised physical YAM station.
 
 the slice is done when a clean checkout can ingest one MCAP cohort, reproduce the LeRobot dataset revision, train or load the two pinned policies, evaluate against a sealed fixture set, reproduce attribution byte-for-byte, simulate and optionally execute the devnet payout, and verify the resulting superseding finalized manifest without manual JSON edits.
 

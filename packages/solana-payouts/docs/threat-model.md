@@ -28,7 +28,7 @@
 | replay or double pay after crash | signed-byte write-ahead journal, deterministic batch ids, signature history lookup, same-byte retries | a missing signature after expiry is ambiguous and needs manual investigation |
 | partial batch payment | solana transaction atomicity | separate batches can finalize independently |
 | key theft or leakage | no embedded keys, no secret output, `0600` devnet key files, no key loading in dry-run/reconcile | local files remain unsuitable for production custody |
-| identity leakage | strict manifest rejects metadata; memo contains only batch/hash references | wallet and amount linkage is inherently public; timing analysis remains possible |
+| identity leakage | strict manifest rejects metadata and transactions contain no memo or reference instruction | wallet and amount linkage is inherently public; timing analysis remains possible |
 | state tampering | raw transaction sha-256 and signature verification, strict state schema, `0600` atomic writes | an attacker controlling both state and executable can still alter a future run |
 | dependency compromise | pinned lockfile, modern official solana packages, production audit gate | registry or build-system compromise remains a supply-chain risk |
 | multisig bypass | mainnet disabled; explicit signer integration boundary | a bad adapter could sign a different message unless independently decoded and approved |

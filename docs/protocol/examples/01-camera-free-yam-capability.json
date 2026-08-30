@@ -6,8 +6,8 @@
   "object_id": "urn:uuid:11111111-1111-4111-8111-111111111111",
   "issued_at": "2026-08-30T18:00:00Z",
   "payload": {
-    "title": "camera-free guarded-button press on an I2RT YAM right arm",
-    "summary": "learn contact-robust button pressing from proprioception, a supplied target pose, and a fixture switch; cameras, audio, and biometric capture are prohibited.",
+    "title": "camera-free keyed-peg insertion on an I2RT YAM right arm",
+    "summary": "learn contact-robust fixed-geometry insertion from synchronized commands, proprioception, gripper state, safety events, and manual outcomes; cameras, audio, and biometric capture are prohibited.",
     "requester": {
       "actor_id": "urn:capy:actor:requester-lab",
       "role": "capability_requester",
@@ -44,130 +44,101 @@
       "tool_frame": "yam_gripper_tip"
     },
     "task": {
-      "instruction": "from the randomized safe start pose, move the gripper tip to the supplied fixture target pose, depress the guarded button until the dry-contact switch remains true for 200 ms, then retreat 50 mm along the tool z axis.",
+      "instruction": "from the declared safe start pose, insert the keyed peg into the surveyed fixed socket, stop on any registered safety event, and record the operator-confirmed outcome before reset.",
       "workspace": {
-        "uri": "https://artifacts.example.capy.network/tasks/guarded-button/workspace-v1.json",
+        "uri": "https://artifacts.example.capy.network/tasks/keyed-peg/workspace-v1.json",
         "media_type": "application/json",
         "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
         "size_bytes": "8441"
       },
       "initial_conditions": [
-        "the fixture is attached to one of four indexed mounting points inside the declared workspace",
-        "the target pose is published before motion and remains constant for the episode",
+        "the fixed socket geometry and permitted boundary offsets are identified before motion",
+        "the surveyed target pose remains constant for the episode and is not camera-derived",
         "the robot starts inside the safe joint-state envelope with the gripper open"
       ],
       "success_conditions": [
         {
-          "channel": "/capy/fixture/switch",
-          "field": "data",
+          "channel": "/capy/episode_end",
+          "field": "outcome",
           "operator": "eq",
-          "value": true,
-          "hold_ms": 200
+          "value": "success",
+          "hold_ms": 0
         }
       ],
       "failure_conditions": [
-        "the switch does not latch within the task duration",
-        "a safety diagnostic reaches error severity",
+        "the keyed peg does not reach the registered insertion depth within the task duration",
+        "a motor fault, temperature limit, force limit, or manual safety stop is active",
         "the operator or evaluator triggers an emergency stop"
       ],
       "maximum_duration_ms": 12000
     },
     "interfaces": {
       "middleware": {
-        "name": "ROS 2",
-        "distribution": "Jazzy",
+        "kind": "direct_i2rt",
+        "name": "i2rt",
+        "version": "47fee5e7dec4e30ca054f798bda1c8894b465ed2",
         "time_basis": "system_time",
-        "frame_semantics": "tf2"
+        "frame_semantics": "fixed_geometry"
       },
       "raw_evidence": {
         "container": "MCAP",
         "container_major_version": "0",
-        "recorder": "rosbag2_storage_mcap",
-        "message_encoding": "cdr",
+        "profile": "capy.i2rt.camera_free.v1",
+        "producer": {
+          "kind": "direct_i2rt",
+          "name": "capy_i2rt_recorder",
+          "version": "0.1.0",
+          "source_revision": "47fee5e7dec4e30ca054f798bda1c8894b465ed2"
+        },
+        "message_encoding": "json",
         "channels": [
           {
-            "topic": "/joint_states",
-            "ros_type": "sensor_msgs/msg/JointState",
-            "direction": "observation",
-            "required": true,
-            "qos": {
-              "reliability": "best_effort",
-              "durability": "volatile",
-              "history": "keep_last",
-              "depth": 10
-            }
-          },
-          {
-            "topic": "/yam/joint_command",
-            "ros_type": "trajectory_msgs/msg/JointTrajectory",
-            "direction": "action",
-            "required": true,
-            "qos": {
-              "reliability": "reliable",
-              "durability": "volatile",
-              "history": "keep_last",
-              "depth": 10
-            }
-          },
-          {
-            "topic": "/capy/task/target",
-            "ros_type": "geometry_msgs/msg/PoseStamped",
-            "direction": "observation",
-            "required": true,
-            "qos": {
-              "reliability": "reliable",
-              "durability": "transient_local",
-              "history": "keep_last",
-              "depth": 1
-            }
-          },
-          {
-            "topic": "/capy/fixture/switch",
-            "ros_type": "std_msgs/msg/Bool",
+            "topic": "/capy/session_start",
+            "schema_name": "capy.i2rt.camera_free.v1",
             "direction": "event",
-            "required": true,
-            "qos": {
-              "reliability": "reliable",
-              "durability": "volatile",
-              "history": "keep_last",
-              "depth": 10
-            }
+            "required": true
           },
           {
-            "topic": "/tf",
-            "ros_type": "tf2_msgs/msg/TFMessage",
-            "direction": "transform",
-            "required": true,
-            "qos": {
-              "reliability": "reliable",
-              "durability": "volatile",
-              "history": "keep_last",
-              "depth": 100
-            }
+            "topic": "/capy/session_end",
+            "schema_name": "capy.i2rt.camera_free.v1",
+            "direction": "event",
+            "required": true
           },
           {
-            "topic": "/tf_static",
-            "ros_type": "tf2_msgs/msg/TFMessage",
-            "direction": "transform",
-            "required": true,
-            "qos": {
-              "reliability": "reliable",
-              "durability": "transient_local",
-              "history": "keep_last",
-              "depth": 1
-            }
+            "topic": "/capy/episode_start",
+            "schema_name": "capy.i2rt.camera_free.v1",
+            "direction": "event",
+            "required": true
           },
           {
-            "topic": "/diagnostics",
-            "ros_type": "diagnostic_msgs/msg/DiagnosticArray",
+            "topic": "/capy/frame",
+            "schema_name": "capy.i2rt.camera_free.v1",
+            "direction": "observation",
+            "required": true
+          },
+          {
+            "topic": "/capy/intervention",
+            "schema_name": "capy.i2rt.camera_free.v1",
+            "direction": "event",
+            "required": true
+          },
+          {
+            "topic": "/capy/safety_event",
+            "schema_name": "capy.i2rt.camera_free.v1",
             "direction": "diagnostic",
-            "required": true,
-            "qos": {
-              "reliability": "reliable",
-              "durability": "volatile",
-              "history": "keep_last",
-              "depth": 10
-            }
+            "required": true
+          },
+          {
+            "topic": "/capy/clock_issue",
+            "schema_name": "capy.i2rt.camera_free.v1",
+            "direction": "diagnostic",
+            "required": true
+          },
+          {
+            "topic": "/capy/episode_end",
+            "schema_name": "capy.i2rt.camera_free.v1",
+            "direction": "event",
+            "required": true
           }
         ],
         "index_required": true,
@@ -209,39 +180,33 @@
               "gripper.effort"
             ],
             "source_topics": [
-              "/joint_states"
+              "/capy/frame"
             ]
           },
           {
-            "key": "observation.task.target_pose",
-            "dtype": "float32",
-            "shape": [
-              7
-            ],
-            "names": [
-              "x",
-              "y",
-              "z",
-              "qx",
-              "qy",
-              "qz",
-              "qw"
-            ],
-            "source_topics": [
-              "/capy/task/target"
-            ]
-          },
-          {
-            "key": "observation.fixture.switch",
+            "key": "observation.intervention_active",
             "dtype": "bool",
             "shape": [
               1
             ],
             "names": [
-              "pressed"
+              "active"
             ],
             "source_topics": [
-              "/capy/fixture/switch"
+              "/capy/frame"
+            ]
+          },
+          {
+            "key": "observation.safety_active",
+            "dtype": "bool",
+            "shape": [
+              1
+            ],
+            "names": [
+              "active"
+            ],
+            "source_topics": [
+              "/capy/frame"
             ]
           },
           {
@@ -260,7 +225,7 @@
               "gripper"
             ],
             "source_topics": [
-              "/yam/joint_command"
+              "/capy/frame"
             ]
           },
           {
@@ -273,7 +238,7 @@
               "seconds"
             ],
             "source_topics": [
-              "/joint_states"
+              "/capy/frame"
             ]
           }
         ]
@@ -391,13 +356,13 @@
     "canonicalization": "RFC8785",
     "hash_algorithm": "sha-256",
     "digest_scope": "object-without-integrity-or-signatures",
-    "object_digest": "sha256:857c5ae16e45c538e39288d06a0e5476d23d7ce03c846b3403e02a48ea80856e"
+    "object_digest": "sha256:49b5c0b6f0020dd8460850d5aed320d1e04ccf0543506818a7e3c84b9de69e2c"
   },
   "signatures": [
     {
       "algorithm": "Ed25519",
       "key_id": "urn:capy:key:requester-lab-2026-01",
-      "signed_digest": "sha256:857c5ae16e45c538e39288d06a0e5476d23d7ce03c846b3403e02a48ea80856e",
+      "signed_digest": "sha256:49b5c0b6f0020dd8460850d5aed320d1e04ccf0543506818a7e3c84b9de69e2c",
       "signature_base64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "created_at": "2026-08-30T18:00:01Z"
     }

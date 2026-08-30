@@ -14,7 +14,7 @@
 
 | metric | estimate | stratified paired-bootstrap 95% interval |
 |---|---:|---:|
-| random absolute gain over baseline | 11.2% | 1.7% to 20.2% |
+| random absolute gain over baseline | 11.3% | 1.7% to 20.2% |
 | targeted absolute gain over baseline | 23.1% | 14.2% to 31.9% |
 | targeted/random gain per dollar | 2.056x | not reported; bootstrap denominator crosses or approaches zero |
 | gain/$1k contrast above the 1.25x gate | 6.9% | 1.6% to 12.4% |

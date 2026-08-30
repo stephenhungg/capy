@@ -6,7 +6,7 @@ mainnet mint validation and dry-run planning exist, but `submissionEnabled` is f
 
 - [ ] replace local key files with an audited hsm/mpc/multisig adapter
 - [ ] require independent manifest approval and signer quorum
-- [ ] decode and display the final compiled message to approvers, including mint, source, every recipient ata, amount, fee payer, compute budget, and memo
+- [ ] decode and display the final compiled message to approvers, including mint, source, every recipient ata, amount, fee payer, and compute budget; reject any memo or reference instruction
 - [ ] enforce per-payout, per-manifest, daily, and treasury-balance limits outside operator-controlled cli flags
 - [ ] document key rotation, signer loss, emergency pause, and compromise response
 

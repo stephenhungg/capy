@@ -70,6 +70,12 @@ describe("size-aware payout planning", () => {
     const compiled = getCompiledTransactionMessageDecoder().decode(transaction.messageBytes);
     expect(compiled.staticAccounts[0]).toBe(sponsor.address);
     expect(compiled.staticAccounts).toContain(treasury.address);
+    expect(compiled.staticAccounts).toContain(
+      address("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+    );
+    expect(compiled.staticAccounts).not.toContain(
+      address("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr")
+    );
   });
 });
 

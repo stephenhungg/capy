@@ -4,5 +4,6 @@ export * from "./executor.js";
 export * from "./manifest.js";
 export * from "./network.js";
 export * from "./plan.js";
+export * from "./protocol.js";
 export * from "./rpc.js";
 export * from "./state.js";
