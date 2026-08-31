@@ -214,15 +214,15 @@ export function FormaStudio() {
         <div className="menu-top"><Logo light /><MenuToggle open={menuOpen} onClick={() => setMenuOpen(false)} light /></div>
         <p className="menu-intro menu-reveal">We turn specific robot failures into<br />targeted experience, verified capability,<br />and fair contributor payouts.</p>
         <nav className="menu-links">{navItems.map(([label, href]) => <RollLink key={label} label={label} href={href} className="menu-reveal" />)}</nav>
-        <div className="menu-bottom menu-reveal"><div><RollLink label="Research" href="#process" /><RollLink label="Network" href="#service" /><RollLink label="Receipts" href="#projects" /></div><div><RollLink label="hello@capy.network" href="mailto:hello@capy.network" /><RollLink label="Enter dashboard" href="/dashboard" /></div></div>
+        <div className="menu-bottom menu-reveal"><div><RollLink label="Research" href="#process" /><RollLink label="Network" href="#service" /><RollLink label="Receipts" href="#projects" /></div><div><RollLink label="hello@capy.network" href="mailto:hello@capy.network" /><RollLink label="View demo dashboard" href="/dashboard" /></div></div>
       </div>
 
       <section id="hero" className="hero">
         <div className="hero-media"><Image className="hero-image" src="/kawaii/hero-network.png" alt="Capy field engineer connecting a robot failure to a verified capability receipt" fill priority sizes="100vw" /></div>
         <div className="hero-shade" />
         <div className="hero-inner">
-          <header className="hero-nav"><Logo light /><nav>{navItems.map(([label, href]) => <RollLink key={label} label={label} href={href} />)}</nav><div className="hero-contact"><RollLink label="hello@capy.network" href="mailto:hello@capy.network" /><RollLink label="Enter dashboard" href="/dashboard" /></div><div className="hero-menu"><MenuToggle open={menuOpen} onClick={() => setMenuOpen(true)} light /></div></header>
-          <div className="hero-copy"><p><span className="hero-word">Turn robot failures into targeted experience,</span><br /><span className="hero-word">verified capability gain, and fair payouts</span><br /><span className="hero-word">for the contributors who made it happen.</span></p><ActionLink href="/dashboard">Enter dashboard</ActionLink></div>
+          <header className="hero-nav"><Logo light /><nav>{navItems.map(([label, href]) => <RollLink key={label} label={label} href={href} />)}</nav><div className="hero-contact"><RollLink label="hello@capy.network" href="mailto:hello@capy.network" /><RollLink label="View demo dashboard" href="/dashboard" /></div><div className="hero-menu"><MenuToggle open={menuOpen} onClick={() => setMenuOpen(true)} light /></div></header>
+          <div className="hero-copy"><p><span className="hero-word">Turn robot failures into targeted experience,</span><br /><span className="hero-word">verified capability gain, and fair payouts</span><br /><span className="hero-word">for the contributors who made it happen.</span></p><ActionLink href="/dashboard">View demo dashboard</ActionLink></div>
           <h1 className="hero-title hero-word"><span>capy</span><sup aria-label="registered">R</sup></h1>
         </div>
       </section>

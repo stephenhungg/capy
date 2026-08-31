@@ -12,7 +12,8 @@ failure → contract → experience → evaluation → attribution → payout
 ## what works
 
 - an authenticated, role-separated web platform for buyers, contributors, evaluators, and operators;
-- a same-origin Vercel dashboard that reports the live camera-free Railway ingest without exposing ingest credentials;
+- a same-origin, no-login contributor dashboard that walks through a safe synthetic job, review, evaluation, and projected payout;
+- a separate live status surface that reports the camera-free Railway ingest without exposing ingest credentials;
 - durable D1 workflow state, memberships, invitations, idempotent commands, audit events, and executor handoffs;
 - immutable protocol objects in R2 with storage-byte and RFC 8785 object-digest verification;
 - a direct, camera-free i2rt recorder contract using synchronized JSON MCAP channels;
@@ -40,7 +41,8 @@ the cloud never commands the robot. the public chain never receives contributor 
 ## live services
 
 - landing: [capy.stephenhung.me](https://capy.stephenhung.me)
-- live dashboard: [capy.stephenhung.me/dashboard](https://capy.stephenhung.me/dashboard)
+- contributor demo dashboard: [capy.stephenhung.me/dashboard](https://capy.stephenhung.me/dashboard)
+- live network status: [capy.stephenhung.me/status](https://capy.stephenhung.me/status)
 - authenticated legacy control plane: [capy-network.stephenhung.chatgpt.site](https://capy-network.stephenhung.chatgpt.site)
 - camera-free ingress health: [capy-i2rt-production.up.railway.app/health](https://capy-i2rt-production.up.railway.app/health)
 
@@ -58,7 +60,8 @@ the canonical schemas and linked example objects live in [`schemas/`](./schemas)
 
 ## repo map
 
-- `app/dashboard` — Vercel-native minimal network surface backed by the Railway public aggregate
+- `app/dashboard` — public, read-only contributor walkthrough projected from the canonical synthetic fixtures
+- `app/status` — Vercel-native network surface backed by the Railway public aggregate
 - `apps/web` — authenticated Sites application, D1 schema, R2 object store, workflow, receipts, and operations UI
 - `services/i2rt-ingest` — Railway Postgres + object-storage boundary for authenticated, integrity-verified camera-free sessions
 - `packages/i2rt-recorder` — camera-free i2rt journal and MCAP export
@@ -71,7 +74,7 @@ the canonical schemas and linked example objects live in [`schemas/`](./schemas)
 
 ## run the web surfaces
 
-the canonical landing and live dashboard are one Next.js deployment:
+the canonical landing, contributor demo, and live network status are one Next.js deployment:
 
 ```bash
 npm install

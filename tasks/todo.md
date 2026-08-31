@@ -48,6 +48,14 @@
 - [x] prove physical manifests and arbitrary artifacts cannot enter through the demo lane
 - [x] deploy and verify the anonymous fixture flow against production Railway
 
+## public user dashboard demo
+
+- [x] route the marketing site into a no-login, read-only user dashboard walkthrough
+- [x] show a coherent contributor job, submission evidence, review state, and projected payout using synthetic data
+- [x] make demo mode unmistakable and disable uploads, wallet actions, payouts, and other mutations
+- [x] preserve the minimal dashboard hierarchy and responsive behavior
+- [ ] test, deploy to Vercel, and verify the complete landing-to-demo route
+
 ## product rule
 
 the fixed-geometry YAM experiment is the first production workflow inside capy, not a standalone demo. early code must remain reusable platform infrastructure with durable data, real authorization, inspectable evidence, and production operations.
@@ -68,4 +76,6 @@ the fixed-geometry YAM experiment is the first production workflow inside capy, 
 - physical provenance is explicitly operator-declared until signed per-rig attestation and server-side journal validation exist.
 - the no-token lane verifies one byte-exact synthetic fixture in memory and returns an explicitly nonpersistent, nonphysical, non-payout receipt; it never opens anonymous production ingestion.
 - Railway deployment `f03c5ce2-c7c0-4a7f-83f3-d6d51525f610` returned `SUCCESS`; both the repository script and immutable two-curl flow produced the same production receipt while durable counts stayed unchanged and the physical route remained `401` without its bearer.
+- `/dashboard` is now the public, no-login contributor walkthrough; the live Railway and physical-rig view remains available separately at `/status`.
+- the public page is a static server component fed by an allowlisted fixture projection, and its regression gate rejects client handlers, forms, API paths, or failed evaluation copy that would imply unsafe actions or success.
 - remaining product work is real job creation, submission ingestion, live hidden trials, hardware sessions, funded treasury operation, and a connected Solana executor.

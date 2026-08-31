@@ -9,9 +9,10 @@
     "start": "next start",
     "lint": "eslint app components",
     "typecheck": "tsc --noEmit",
-    "test": "npm run test:protocol && npm run validate:trust",
+    "test": "npm run test:protocol && npm run validate:trust && npm run validate:public-dashboard",
     "test:protocol": "node scripts/validate-protocol.mjs",
-    "validate:trust": "node scripts/validate-trust-schemas.mjs"
+    "validate:trust": "node scripts/validate-trust-schemas.mjs",
+    "validate:public-dashboard": "node scripts/validate-public-dashboard.mjs"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",
