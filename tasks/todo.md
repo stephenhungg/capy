@@ -46,7 +46,7 @@
 - [x] keep anonymous demo requests quarantined from storage, physical evidence, evaluation, and payout eligibility
 - [x] provide one command that uploads the fixture without an operator-managed secret
 - [x] prove physical manifests and arbitrary artifacts cannot enter through the demo lane
-- [ ] deploy and verify the anonymous fixture flow against production Railway
+- [x] deploy and verify the anonymous fixture flow against production Railway
 
 ## product rule
 
@@ -67,4 +67,5 @@ the fixed-geometry YAM experiment is the first production workflow inside capy, 
 - the friend-hosted edge path now converts only closed exact-cycle physical journals into immutable ingest envelopes and safely resumes partial write-once uploads.
 - physical provenance is explicitly operator-declared until signed per-rig attestation and server-side journal validation exist.
 - the no-token lane verifies one byte-exact synthetic fixture in memory and returns an explicitly nonpersistent, nonphysical, non-payout receipt; it never opens anonymous production ingestion.
+- Railway deployment `f03c5ce2-c7c0-4a7f-83f3-d6d51525f610` returned `SUCCESS`; both the repository script and immutable two-curl flow produced the same production receipt while durable counts stayed unchanged and the physical route remained `401` without its bearer.
 - remaining product work is real job creation, submission ingestion, live hidden trials, hardware sessions, funded treasury operation, and a connected Solana executor.
