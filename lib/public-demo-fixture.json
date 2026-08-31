@@ -1,0 +1,35 @@
+{
+  "job": {
+    "title": "camera-free keyed-peg insertion on an I2RT YAM right arm",
+    "summary": "learn contact-robust fixed-geometry insertion from synchronized commands, proprioception, gripper state, safety events, and manual outcomes; cameras, audio, and biometric capture are prohibited.",
+    "embodiment": "I2RT Robotics YAM right arm",
+    "capture": "camera-free · fixed geometry"
+  },
+  "submission": {
+    "episodes": 120,
+    "successfulEpisodes": 113,
+    "rejectedEpisodes": 0,
+    "cameraStreams": 0,
+    "topicsPresent": true,
+    "monotonicTimestamps": true,
+    "alignmentP95Ms": "4.8"
+  },
+  "evaluation": {
+    "baseline": "35%",
+    "candidate": "75%",
+    "liftPercentagePoints": 40,
+    "trials": 40,
+    "safetyViolations": 0,
+    "passed": true
+  },
+  "payout": {
+    "contributorEligible": true,
+    "contributorSharePercent": 75,
+    "projectedAmount": "75.00",
+    "poolAmount": "100.00",
+    "asset": "USDC",
+    "network": "Solana devnet",
+    "state": "planned",
+    "transactions": 0
+  }
+}

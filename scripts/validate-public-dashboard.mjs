@@ -9,11 +9,13 @@ async function readJson(path) {
   return JSON.parse(await readFile(new URL(path, repoRoot), "utf8"));
 }
 
-const [cohort, evaluation, attribution, payout, dashboardSource] = await Promise.all([
+const [capability, cohort, evaluation, attribution, payout, publicProjection, dashboardSource] = await Promise.all([
+  readJson("docs/protocol/examples/01-camera-free-yam-capability.json"),
   readJson("docs/protocol/examples/02-camera-free-yam-cohort.json"),
   readJson("docs/protocol/examples/03-camera-free-yam-evaluation.json"),
   readJson("docs/protocol/examples/04-camera-free-yam-attribution.json"),
   readJson("docs/protocol/examples/05-camera-free-yam-payout.json"),
+  readJson("lib/public-demo-fixture.json"),
   readFile(new URL("app/dashboard/page.tsx", repoRoot), "utf8"),
 ]);
 
@@ -41,6 +43,44 @@ assert.equal(payout.payload.asset.symbol, "USDC");
 assert.equal(payout.payload.asset.decimals, 6);
 assert.equal(payout.payload.settlement.state, "planned");
 assert.equal(payout.payload.settlement.transactions.length, 0);
+
+const expectedProjection = {
+  job: {
+    title: capability.payload.title,
+    summary: capability.payload.summary,
+    embodiment: `${capability.payload.embodiment.manufacturer} ${capability.payload.embodiment.model} right arm`,
+    capture: "camera-free · fixed geometry",
+  },
+  submission: {
+    episodes: cohort.payload.episode_set.episode_count,
+    successfulEpisodes: cohort.payload.episode_set.successful_episode_count,
+    rejectedEpisodes: cohort.payload.quality.rejected_episode_ids.length,
+    cameraStreams: cohort.payload.privacy.camera_free ? 0 : null,
+    topicsPresent: cohort.payload.quality.required_topics_present,
+    monotonicTimestamps: cohort.payload.quality.timestamp_monotonicity,
+    alignmentP95Ms: cohort.payload.quality.action_state_alignment_ms_p95,
+  },
+  evaluation: {
+    baseline: `${Math.round(Number(successMetric.baseline) * 100)}%`,
+    candidate: `${Math.round(Number(successMetric.candidate) * 100)}%`,
+    liftPercentagePoints: Math.round(Number(successMetric.absolute_delta) * 100),
+    trials: successMetric.sample_size,
+    safetyViolations: evaluation.payload.safety.violation_count,
+    passed: evaluation.payload.decision.passed && safetyMetric.gates.every((gate) => gate.passed),
+  },
+  payout: {
+    contributorEligible: contributorAllocation.eligibility.eligible,
+    contributorSharePercent: contributorAllocation.weight_ppm / 10_000,
+    projectedAmount: (Number(contributorAllocation.payout_amount_base_units) / 10 ** payout.payload.asset.decimals).toFixed(2),
+    poolAmount: (Number(attribution.payload.payout_pool.amount_base_units) / 10 ** payout.payload.asset.decimals).toFixed(2),
+    asset: payout.payload.asset.symbol,
+    network: `Solana ${payout.payload.cluster.name}`,
+    state: payout.payload.settlement.state,
+    transactions: payout.payload.settlement.transactions.length,
+  },
+};
+
+assert.deepEqual(publicProjection, expectedProjection);
 
 const failedPresentation = getPublicDemoPresentation({
   evaluationPassed: false,
