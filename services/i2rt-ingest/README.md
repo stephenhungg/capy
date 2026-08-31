@@ -99,7 +99,8 @@ packages/i2rt-recorder/scripts/demo-upload.sh
 from a fresh linux machine with `curl`, pipe the immutable bundle directly to railway:
 
 ```bash
-curl --fail --silent --show-error --location BUNDLE_RAW_URL |
+curl --fail --silent --show-error --location \
+  https://raw.githubusercontent.com/stephenhungg/capy/b1987b6342492eb71f8cf5b94f0704ce783760d7/packages/i2rt-recorder/fixtures/demo-v1/upload.json |
   curl \
     --fail-with-body \
     --silent \
@@ -109,7 +110,7 @@ curl --fail --silent --show-error --location BUNDLE_RAW_URL |
     https://capy-i2rt-production.up.railway.app/v1/demo/sessions
 ```
 
-replace `BUNDLE_RAW_URL` with the commit-pinned raw github url after the golden bundle is published. the full contract and safety boundary are in [`packages/i2rt-recorder/docs/demo-upload.md`](../../packages/i2rt-recorder/docs/demo-upload.md). neither command sends an authorization header; the physical endpoints below still require the ingest bearer.
+the full contract and safety boundary are in [`packages/i2rt-recorder/docs/demo-upload.md`](../../packages/i2rt-recorder/docs/demo-upload.md). neither command sends an authorization header; the physical endpoints below still require the ingest bearer.
 
 the manifest's artifact names resolve beside the manifest file. create the journal and manifest with real sizes and digests, then run:
 

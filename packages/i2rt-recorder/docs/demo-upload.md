@@ -13,7 +13,8 @@ the script posts only the checked-in `fixtures/demo-v1/upload.json` contract. it
 from a fresh linux machine with only `curl`, use the pinned raw bundle url once it has been published:
 
 ```bash
-curl --fail --silent --show-error --location BUNDLE_RAW_URL |
+curl --fail --silent --show-error --location \
+  https://raw.githubusercontent.com/stephenhungg/capy/b1987b6342492eb71f8cf5b94f0704ce783760d7/packages/i2rt-recorder/fixtures/demo-v1/upload.json |
   curl \
     --fail-with-body \
     --silent \
@@ -23,6 +24,6 @@ curl --fail --silent --show-error --location BUNDLE_RAW_URL |
     https://capy-i2rt-production.up.railway.app/v1/demo/sessions
 ```
 
-`BUNDLE_RAW_URL` must be replaced with the immutable, commit-pinned raw github url for `packages/i2rt-recorder/fixtures/demo-v1/upload.json`. do not point the command at a mutable branch.
+the raw github url is pinned to the commit that introduced the golden fixture. do not replace it with a mutable branch.
 
 the response is a stable verification receipt marked `synthetic_fixture`, `physicalEvidence: false`, `payoutEligible: false`, and `persisted: false`. the real physical uploader remains bearer-authenticated and uses [`upload-session.sh`](../scripts/upload-session.sh).
