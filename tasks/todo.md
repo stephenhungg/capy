@@ -31,6 +31,15 @@
 - [ ] connect bounty, evaluation, receipt, and Solana payout services
 - [ ] validate, deploy, and operate the first permanent end-to-end workflow
 
+## first physical YAM session
+
+- [x] package a closed physical recorder journal into a strict Railway ingest manifest
+- [x] reject fixture, incomplete, best-effort, unknown-rig, and non-camera-free recordings before upload
+- [x] provide the friend-hosted i2rt computer one post-session upload command with no inbound networking
+- [ ] provision the ingest credential through a private handoff; never commit or paste it into browser code
+- [ ] capture one human-supervised physical episode and record its manual outcome
+- [ ] upload, hash-verify, finalize, and confirm the new physical session in the public aggregate
+
 ## product rule
 
 the fixed-geometry YAM experiment is the first production workflow inside capy, not a standalone demo. early code must remain reusable platform infrastructure with durable data, real authorization, inspectable evidence, and production operations.
@@ -47,4 +56,6 @@ the fixed-geometry YAM experiment is the first production workflow inside capy, 
 - production verification returned `200` for `/`, `/dashboard`, and `/api/health`; `/dashboard` emitted no cross-origin redirect and rendered the live Railway aggregate with zero browser errors.
 - the Railway ingress accepts only explicit zero-camera manifests, uses conditional direct uploads, and marks a session complete only after streaming byte-length and sha-256 verification.
 - a validated hardware-free i2rt journal plus deterministic MCAP completed the live Railway registration, retry, upload, finalization, and aggregate-status path.
+- the friend-hosted edge path now converts only closed exact-cycle physical journals into immutable ingest envelopes and safely resumes partial write-once uploads.
+- physical provenance is explicitly operator-declared until signed per-rig attestation and server-side journal validation exist.
 - remaining product work is real job creation, submission ingestion, live hidden trials, hardware sessions, funded treasury operation, and a connected Solana executor.

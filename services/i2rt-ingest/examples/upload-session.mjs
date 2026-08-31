@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 
+import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+
+async function sha256File(path) {
+  const hash = createHash("sha256");
+  for await (const chunk of createReadStream(path)) hash.update(chunk);
+  return hash.digest("hex");
+}
 
 const [manifestArgument] = process.argv.slice(2);
 const apiUrl = process.env.CAPY_INGEST_URL?.replace(/\/$/, "");
@@ -16,6 +23,20 @@ if (!manifestArgument || !apiUrl || !token) {
 } else {
   const manifestPath = resolve(manifestArgument);
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const artifactPaths = new Map();
+  for (const artifact of manifest.artifacts) {
+    const artifactPath = resolve(dirname(manifestPath), artifact.name);
+    const artifactStat = await stat(artifactPath);
+    if (artifactStat.size !== artifact.byteLength) {
+      throw new Error(`${artifact.name} changed after the manifest was created`);
+    }
+    const actualSha256 = await sha256File(artifactPath);
+    if (actualSha256 !== artifact.sha256) {
+      throw new Error(`${artifact.name} sha256 does not match the manifest`);
+    }
+    artifactPaths.set(artifact.id, artifactPath);
+  }
+
   const registrationResponse = await fetch(`${apiUrl}/v1/sessions`, {
     method: "POST",
     headers: {
@@ -32,7 +53,8 @@ if (!manifestArgument || !apiUrl || !token) {
   for (const upload of registration.uploads) {
     const artifact = manifest.artifacts.find((candidate) => candidate.id === upload.artifactId);
     if (!artifact) throw new Error(`registration returned unknown artifact ${upload.artifactId}`);
-    const artifactPath = resolve(dirname(manifestPath), artifact.name);
+    const artifactPath = artifactPaths.get(artifact.id);
+    if (!artifactPath) throw new Error(`artifact ${artifact.id} was not preflighted`);
     const artifactStat = await stat(artifactPath);
     if (artifactStat.size !== artifact.byteLength) {
       throw new Error(`${artifact.name} changed after the manifest was created`);
@@ -43,7 +65,7 @@ if (!manifestArgument || !apiUrl || !token) {
       body: createReadStream(artifactPath),
       duplex: "half",
     });
-    if (!uploadResponse.ok) {
+    if (!uploadResponse.ok && uploadResponse.status !== 412) {
       throw new Error(`upload failed for ${artifact.id} (${uploadResponse.status})`);
     }
   }

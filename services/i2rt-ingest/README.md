@@ -77,6 +77,17 @@ npm start
 
 ## edge upload
 
+for a closed recording produced by the checked-in recorder, use the fail-closed packager and uploader from the repository root:
+
+```bash
+packages/i2rt-recorder/scripts/upload-session.sh \
+  /data/capy/<physical-session-directory> \
+  cap-yam-fixed-insertion-v1 \
+  first-physical-yam-run
+```
+
+the physical runbook and private-token handoff are documented in [`packages/i2rt-recorder/docs/first-physical-session.md`](../../packages/i2rt-recorder/docs/first-physical-session.md).
+
 the manifest's artifact names resolve beside the manifest file. create the journal and manifest with real sizes and digests, then run:
 
 ```bash

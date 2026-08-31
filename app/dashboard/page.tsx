@@ -55,7 +55,7 @@ export default async function Dashboard() {
             the upload and integrity path is verified with a hardware-free fixture. the actual rig still needs its edge token and one completed session before we claim physical evidence.
           </p>
           <div className={styles.actions}>
-            <a href="https://github.com/stephenhungg/capy/tree/main/packages/i2rt-recorder">
+            <a href="https://github.com/stephenhungg/capy/blob/main/packages/i2rt-recorder/docs/first-physical-session.md">
               open edge setup <span aria-hidden="true">↗</span>
             </a>
             <Link href="/api/health">json status</Link>
