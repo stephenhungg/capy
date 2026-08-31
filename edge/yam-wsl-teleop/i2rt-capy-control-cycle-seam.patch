@@ -1,0 +1,22 @@
+diff --git a/i2rt/robots/motor_chain_robot.py b/i2rt/robots/motor_chain_robot.py
+index 18da115..a9b2b10 100644
+--- a/i2rt/robots/motor_chain_robot.py
++++ b/i2rt/robots/motor_chain_robot.py
+@@ -423,6 +423,17 @@ class MotorChainRobot(Robot):
+         )
+         self._joint_state = self._motor_state_to_joint_state(motor_state)
+ 
++        # capy control-cycle recording seam (see capy i2rt-recorder docs/architecture.md):
++        # opt-in per-instance hook; captures the exact command that reached the chain
++        # plus the same cycle's feedback. Set robot._capy_frame_hook to enable.
++        capy_hook = getattr(self, "_capy_frame_hook", None)
++        if capy_hook is not None:
++            try:
++                capy_hook(motor_state, joint_commands, motor_torques)
++            except Exception:
++                logging.exception("capy frame hook failed; disabling it")
++                self._capy_frame_hook = None
++
+         with self._mcap_lock:
+             if self._mcap_recorder is not None:
+                 try:
