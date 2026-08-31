@@ -1,8 +1,34 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { buildApp } from "../src/app.js";
+import { DEMO_BODY_LIMIT_BYTES, DEMO_CONTENT_TYPE } from "../src/demo.js";
 import { CONTROL_TOKEN, INGEST_TOKEN, MemoryRepository, MemoryStorage, testConfig } from "./helpers.js";
+
+type DemoBundle = {
+  schemaVersion: string;
+  fixtureVersion: string;
+  artifacts: Record<string, string>;
+};
+
+const demoBundlePath = fileURLToPath(
+  new URL("../../../packages/i2rt-recorder/fixtures/demo-v1/upload.json", import.meta.url),
+);
+
+function demoBundle(): DemoBundle {
+  return JSON.parse(readFileSync(demoBundlePath, "utf8")) as DemoBundle;
+}
+
+function demoRequest(payload: object) {
+  return {
+    method: "POST" as const,
+    url: "/v1/demo/sessions",
+    headers: { "content-type": DEMO_CONTENT_TYPE },
+    payload,
+  };
+}
 
 function sha256(bytes: Uint8Array): string {
   return createHash("sha256").update(bytes).digest("hex");
@@ -70,6 +96,136 @@ describe("i2rt ingestion api", () => {
       artifacts: { verified: 0 },
       lastIngestedAt: null,
     });
+  });
+
+  it("verifies the exact synthetic fixture without auth and leaves durable state untouched", async () => {
+    const before = await app.inject({ method: "GET", url: "/v1/public/status" });
+
+    const response = await app.inject(demoRequest(demoBundle()));
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers["content-type"]).toContain(
+      "application/vnd.capy.i2rt-demo-receipt+json",
+    );
+    expect(response.json()).toEqual({
+      schemaVersion: "capy.i2rt.synthetic-demo-receipt.v1",
+      fixtureVersion: "fixed-square-peg-v1@1",
+      fixtureSha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+      dataClass: "synthetic_fixture",
+      integrityVerified: true,
+      persisted: false,
+      physicalEvidence: false,
+      evaluationEligible: false,
+      payoutEligible: false,
+      artifactCount: 4,
+      byteLength: 29_211,
+    });
+    expect(repository.sessions.size).toBe(0);
+    expect(storage.objects.size).toBe(0);
+
+    const after = await app.inject({ method: "GET", url: "/v1/public/status" });
+    expect(after.json()).toEqual(before.json());
+
+    const authenticatedLane = await app.inject({
+      method: "POST",
+      url: "/v1/sessions",
+      payload: fixture("demo-cannot-cross-auth-boundary").manifest,
+    });
+    expect(authenticatedLane.statusCode).toBe(401);
+  });
+
+  it("rejects a one-byte fixture mutation", async () => {
+    const bundle = demoBundle();
+    const encoded = bundle.artifacts["events.ndjson"];
+    if (!encoded) throw new Error("golden demo bundle has no events artifact");
+    const bytes = Buffer.from(encoded, "base64");
+    bytes[0] = (bytes[0] ?? 0) ^ 1;
+    bundle.artifacts["events.ndjson"] = bytes.toString("base64");
+
+    const response = await app.inject(demoRequest(bundle));
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().error).toMatchObject({ code: "invalid_request" });
+    expect(repository.sessions.size).toBe(0);
+    expect(storage.objects.size).toBe(0);
+  });
+
+  it("rejects the wrong fixture version", async () => {
+    const bundle = demoBundle();
+    bundle.fixtureVersion = "physical-yam-run@1";
+
+    const response = await app.inject(demoRequest(bundle));
+
+    expect(response.statusCode).toBe(400);
+    expect(repository.sessions.size).toBe(0);
+    expect(storage.objects.size).toBe(0);
+  });
+
+  it("rejects a missing fixture artifact", async () => {
+    const bundle = demoBundle();
+    delete bundle.artifacts["geometry.json"];
+
+    const response = await app.inject(demoRequest(bundle));
+
+    expect(response.statusCode).toBe(400);
+    expect(repository.sessions.size).toBe(0);
+    expect(storage.objects.size).toBe(0);
+  });
+
+  it("rejects extra fixture fields", async () => {
+    const bundle = demoBundle();
+    bundle.artifacts["camera.png"] = Buffer.from("not allowed", "utf8").toString("base64");
+
+    const response = await app.inject(demoRequest(bundle));
+
+    expect(response.statusCode).toBe(400);
+    expect(repository.sessions.size).toBe(0);
+    expect(storage.objects.size).toBe(0);
+  });
+
+  it("rejects a physical manifest on the synthetic-only route", async () => {
+    const response = await app.inject(demoRequest(fixture("physical-route-confusion").manifest));
+
+    expect(response.statusCode).toBe(400);
+    expect(repository.sessions.size).toBe(0);
+    expect(storage.objects.size).toBe(0);
+  });
+
+  it("requires the vendor media type", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/demo/sessions",
+      headers: { "content-type": "application/json" },
+      payload: demoBundle(),
+    });
+
+    expect(response.statusCode).toBe(415);
+  });
+
+  it("rejects a demo body above 128 KiB before verification", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/demo/sessions",
+      headers: { "content-type": DEMO_CONTENT_TYPE },
+      payload: JSON.stringify({ padding: "x".repeat(DEMO_BODY_LIMIT_BYTES) }),
+    });
+
+    expect(response.statusCode).toBe(413);
+    expect(response.json().error).toMatchObject({ code: "payload_too_large" });
+    expect(repository.sessions.size).toBe(0);
+    expect(storage.objects.size).toBe(0);
+  });
+
+  it("returns a stable receipt and rate-limits the public verifier", async () => {
+    const responses = [];
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      responses.push(await app.inject(demoRequest(demoBundle())));
+    }
+
+    expect(responses.slice(0, 3).map((response) => response.statusCode)).toEqual([200, 200, 200]);
+    expect(responses[1]?.json()).toEqual(responses[0]?.json());
+    expect(responses[2]?.json()).toEqual(responses[0]?.json());
+    expect(responses[3]?.statusCode).toBe(429);
   });
 
   it("requires the correct machine token for registration", async () => {

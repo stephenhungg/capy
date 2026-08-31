@@ -5,6 +5,11 @@ import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import { requireBearer } from "./auth.js";
 import type { AppConfig } from "./config.js";
+import {
+  DEMO_BODY_LIMIT_BYTES,
+  DEMO_CONTENT_TYPE,
+  verifyDemoBundle,
+} from "./demo.js";
 import { parseManifest } from "./domain.js";
 import { AppError, InputError } from "./errors.js";
 import type { SessionRepository } from "./repository.js";
@@ -30,6 +35,24 @@ function parseSessionId(value: unknown): string {
   return result.data;
 }
 
+function isPayloadTooLargeError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "FST_ERR_CTP_BODY_TOO_LARGE"
+  );
+}
+
+function isRateLimitError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "statusCode" in error &&
+    error.statusCode === 429
+  );
+}
+
 export async function buildApp(options: BuildAppOptions): Promise<FastifyInstance> {
   const app = Fastify({
     trustProxy: true,
@@ -46,6 +69,11 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
             },
           },
   });
+  app.addContentTypeParser(
+    DEMO_CONTENT_TYPE,
+    { parseAs: "string" },
+    app.getDefaultJsonParser("error", "error"),
+  );
   const service = new IngestionService(options.repository, options.storage, {
     uploadUrlTtlSeconds: options.config.uploadUrlTtlSeconds,
     downloadUrlTtlSeconds: options.config.downloadUrlTtlSeconds,
@@ -90,6 +118,27 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   };
   app.get("/v1/public/status", publicStatusHandler);
   app.get("/v1/status", publicStatusHandler);
+
+  app.post(
+    "/v1/demo/sessions",
+    {
+      bodyLimit: DEMO_BODY_LIMIT_BYTES,
+      config: { rateLimit: { max: 3, timeWindow: "1 hour" } },
+    },
+    async (request, reply) => {
+      const mediaType = request.headers["content-type"]?.split(";", 1)[0]?.trim().toLowerCase();
+      if (mediaType !== DEMO_CONTENT_TYPE) {
+        throw new AppError(
+          415,
+          "unsupported_media_type",
+          `content-type must be ${DEMO_CONTENT_TYPE}`,
+        );
+      }
+      return reply.type("application/vnd.capy.i2rt-demo-receipt+json").send(
+        verifyDemoBundle(request.body),
+      );
+    },
+  );
 
   app.post(
     "/v1/sessions",
@@ -146,6 +195,24 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
           code: error.code,
           message: error.message,
           ...(error.details === undefined ? {} : { details: error.details }),
+          requestId: request.id,
+        },
+      });
+    }
+    if (isPayloadTooLargeError(error)) {
+      return reply.code(413).send({
+        error: {
+          code: "payload_too_large",
+          message: "request body exceeds the route limit",
+          requestId: request.id,
+        },
+      });
+    }
+    if (isRateLimitError(error)) {
+      return reply.code(429).send({
+        error: {
+          code: "rate_limit_exceeded",
+          message: "too many requests",
           requestId: request.id,
         },
       });

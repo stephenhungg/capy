@@ -40,6 +40,14 @@
 - [ ] capture one human-supervised physical episode and record its manual outcome
 - [ ] upload, hash-verify, finalize, and confirm the new physical session in the public aggregate
 
+## no-token demo lane
+
+- [x] add a public, rate-limited verifier that accepts only the canonical synthetic fixture contract
+- [x] keep anonymous demo requests quarantined from storage, physical evidence, evaluation, and payout eligibility
+- [x] provide one command that uploads the fixture without an operator-managed secret
+- [x] prove physical manifests and arbitrary artifacts cannot enter through the demo lane
+- [ ] deploy and verify the anonymous fixture flow against production Railway
+
 ## product rule
 
 the fixed-geometry YAM experiment is the first production workflow inside capy, not a standalone demo. early code must remain reusable platform infrastructure with durable data, real authorization, inspectable evidence, and production operations.
@@ -58,4 +66,5 @@ the fixed-geometry YAM experiment is the first production workflow inside capy, 
 - a validated hardware-free i2rt journal plus deterministic MCAP completed the live Railway registration, retry, upload, finalization, and aggregate-status path.
 - the friend-hosted edge path now converts only closed exact-cycle physical journals into immutable ingest envelopes and safely resumes partial write-once uploads.
 - physical provenance is explicitly operator-declared until signed per-rig attestation and server-side journal validation exist.
+- the no-token lane verifies one byte-exact synthetic fixture in memory and returns an explicitly nonpersistent, nonphysical, non-payout receipt; it never opens anonymous production ingestion.
 - remaining product work is real job creation, submission ingestion, live hidden trials, hardware sessions, funded treasury operation, and a connected Solana executor.

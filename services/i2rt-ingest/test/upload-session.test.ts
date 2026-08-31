@@ -135,6 +135,7 @@ async function startIngestServer(
 async function runUploader(manifestPath: string, apiUrl: string) {
   const child = spawn(process.execPath, [uploaderPath, manifestPath], {
     env: {
+      NODE_ENV: "test",
       CAPY_INGEST_TOKEN: "test-ingest-token",
       CAPY_INGEST_URL: apiUrl,
       PATH: process.env.PATH ?? "",

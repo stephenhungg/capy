@@ -88,6 +88,29 @@ packages/i2rt-recorder/scripts/upload-session.sh \
 
 the physical runbook and private-token handoff are documented in [`packages/i2rt-recorder/docs/first-physical-session.md`](../../packages/i2rt-recorder/docs/first-physical-session.md).
 
+## no-token synthetic demo
+
+the anonymous demo route accepts only capy's byte-exact, checked-in synthetic fixture. it returns a nonpersistent receipt and cannot create physical evidence or payout-eligible data. from a repository checkout:
+
+```bash
+packages/i2rt-recorder/scripts/demo-upload.sh
+```
+
+from a fresh linux machine with `curl`, pipe the immutable bundle directly to railway:
+
+```bash
+curl --fail --silent --show-error --location BUNDLE_RAW_URL |
+  curl \
+    --fail-with-body \
+    --silent \
+    --show-error \
+    --header "content-type: application/vnd.capy.i2rt-demo+json" \
+    --data-binary @- \
+    https://capy-i2rt-production.up.railway.app/v1/demo/sessions
+```
+
+replace `BUNDLE_RAW_URL` with the commit-pinned raw github url after the golden bundle is published. the full contract and safety boundary are in [`packages/i2rt-recorder/docs/demo-upload.md`](../../packages/i2rt-recorder/docs/demo-upload.md). neither command sends an authorization header; the physical endpoints below still require the ingest bearer.
+
 the manifest's artifact names resolve beside the manifest file. create the journal and manifest with real sizes and digests, then run:
 
 ```bash
